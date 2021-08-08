@@ -1,2 +1,4 @@
+PROJECT_REPOSITORY=github.com/becosuke/golang-examples/projecteuler
+
 all:
-	ls *.go | xargs -n1 -IXXX sh -c "echo XXX && go run XXX"
+	ls */*.go | xargs -IXXXX sh -c "echo XXXX && go run XXXX"

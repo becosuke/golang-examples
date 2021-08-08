@@ -1,23 +1,19 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func main() {
 	// 6 -> 2, 3, 5, 7, 11, 13
 	// cnt := 6
 	cnt := 10001
 	min := 2
-	prime := 0
-	primes := 0
-	for i := min; primes < cnt; i++ {
+	primes := make([]int, 0, cnt)
+	for i := min; len(primes) < cnt; i++ {
 		if isPrime(i) {
-			prime = i
-			primes += 1
+			primes = append(primes, i)
 		}
 	}
-	fmt.Println(prime)
+	fmt.Println(primes[len(primes)-1])
 }
 
 func isPrime(n int) bool {
