@@ -1,6 +1,6 @@
 PROJECT_REPOSITORY=github.com/becosuke/golang-examples/hello
 PROJECT_NAME=hello
-OUTPUT=output
+BIULD=build
 COMMAND_DIR=command
 COMMAND_NAME=server
 COMMAND_PATH=${COMMAND_DIR}/${COMMAND_NAME}
@@ -19,14 +19,15 @@ run:
 test:
 	go test ${PROJECT_REPOSITORY}/${COMMAND_PATH}
 
+.PHONY: build
 build: build-binary build-container
 
 build-binary:
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-w' -o ${OUTPUT}/${COMMAND_NAME} ${PROJECT_REPOSITORY}/${COMMAND_PATH}
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-w' -o ${BUILD}/${COMMAND_NAME} ${PROJECT_REPOSITORY}/${COMMAND_PATH}
 
 build-container:
-	cd ${OUTPUT} && docker build . --no-cache --build-arg name=${COMMAND_NAME} -t ${PROJECT_NAME}-${COMMAND_NAME}:latest -t ${PROJECT_NAME}-${COMMAND_NAME}:$(shell date "+%Y%m%d%H%M%S")
+	cd ${BUILD} && docker build . --no-cache --build-arg name=${COMMAND_NAME} -t ${PROJECT_NAME}-${COMMAND_NAME}:latest -t ${PROJECT_NAME}-${COMMAND_NAME}:$(shell date "+%Y%m%d%H%M%S")
 
 clean:
 	go clean
-	rm -f ${OUTPUT}/${COMMAND_NAME}
+	rm -f ${BUILD}/${COMMAND_NAME}
