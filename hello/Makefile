@@ -1,29 +1,32 @@
-export PROJECT_OWNER=example
-export PROJECT_NAME=hello
-export PROJECT_PATH=${GOPATH}/src/${PROJECT_OWNER}/${PROJECT_NAME}
-export CONTROLLER_PATH=application/controller
-export OUTPUT=binary
+PROJECT_REPOSITORY=github.com/becosuke/golang-examples/hello
+PROJECT_NAME=hello
+OUTPUT=output
+COMMAND_DIR=command
+COMMAND_NAME=server
+COMMAND_PATH=${COMMAND_DIR}/${COMMAND_NAME}
 
-all: deps test build
+all: test build
 
-deps:
-	dep ensure
+mod:
+	go mod vendor
 
-run-hello:
-	make -f ${CONTROLLER_PATH}/hello/Makefile run
+mod-tidy:
+	go mod tidy
 
-test: test-hello
+run:
+	go run ${PROJECT_REPOSITORY}/${COMMAND_PATH}
 
-test-hello:
-	make -f ${CONTROLLER_PATH}/hello/Makefile test
+test:
+	go test ${PROJECT_REPOSITORY}/${COMMAND_PATH}
 
-build: build-hello
+build: build-binary build-container
 
-build-hello:
-	make -f ${CONTROLLER_PATH}/hello/Makefile build
+build-binary:
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-w' -o ${OUTPUT}/${COMMAND_NAME} ${PROJECT_REPOSITORY}/${COMMAND_PATH}
 
-hello: test-hello build-hello
+build-container:
+	cd ${OUTPUT} && docker build . --no-cache --build-arg name=${COMMAND_NAME} -t ${PROJECT_NAME}-${COMMAND_NAME}:latest -t ${PROJECT_NAME}-${COMMAND_NAME}:$(shell date "+%Y%m%d%H%M%S")
 
 clean:
 	go clean
-	rm -f binary/*
+	rm -f ${OUTPUT}/${COMMAND_NAME}
