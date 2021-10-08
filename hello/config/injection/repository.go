@@ -5,10 +5,9 @@ import (
 	"github.com/becosuke/golang-examples/hello/infrastructure/repositoryimpl"
 )
 
-func (c *Container) InjectHelloRepository() repository.HelloRepository {
+func (c *Container) InjectHelloRepository() repository.Hello {
 	if c.cache.HelloRepository == nil {
-		helloRepository := repositoryimpl.NewHelloRepository(c.InjectConfig(), c.InjectClient())
-		c.cache.HelloRepository = helloRepository
+		c.cache.HelloRepository = repositoryimpl.NewHello(c.InjectConfig(), c.InjectHelloClient())
 	}
 	return c.cache.HelloRepository
 }

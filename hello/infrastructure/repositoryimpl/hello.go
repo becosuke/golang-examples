@@ -9,20 +9,19 @@ import (
 	"github.com/becosuke/golang-examples/hello/infrastructure/client"
 )
 
-func NewHelloRepository(cfg *config.Config, clt *client.Client) repository.HelloRepository {
-	return &helloRepositoryImpl{
+func NewHello(cfg *config.Config, clt client.Hello) repository.Hello {
+	return &helloImpl{
 		config: cfg,
 		client: clt,
 	}
 }
 
-type helloRepositoryImpl struct {
+type helloImpl struct {
 	config *config.Config
-	client *client.Client
+	client client.Hello
 }
 
-func (ri *helloRepositoryImpl) GetHello(ctx context.Context) *entity.Hello {
-	ri.client.Get()
+func (ri *helloImpl) Get(ctx context.Context) *entity.Hello {
 	return &entity.Hello{
 		Message: ri.client.Get(),
 	}

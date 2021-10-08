@@ -5,10 +5,9 @@ import (
 	"github.com/becosuke/golang-examples/hello/domain/service"
 )
 
-func (c *Container) InjectHelloService() service.HelloService {
+func (c *Container) InjectHelloService() service.Hello {
 	if c.cache.HelloService == nil {
-		helloService := serviceimpl.NewHelloService(c.InjectConfig(), c.InjectHelloRepository())
-		c.cache.HelloService = helloService
+		c.cache.HelloService = serviceimpl.NewHello(c.InjectConfig(), c.InjectHelloRepository())
 	}
 	return c.cache.HelloService
 }

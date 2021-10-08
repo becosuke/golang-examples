@@ -4,10 +4,9 @@ import (
 	"github.com/becosuke/golang-examples/hello/infrastructure/client"
 )
 
-func (c *Container) InjectClient() *client.Client {
-	if c.cache.Client == nil {
-		clt := client.Client{}
-		c.cache.Client = &clt
+func (c *Container) InjectHelloClient() client.Hello {
+	if c.cache.HelloClient == nil {
+		c.cache.HelloClient = client.NewHello()
 	}
-	return c.cache.Client
+	return c.cache.HelloClient
 }

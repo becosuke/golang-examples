@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/becosuke/golang-examples/hello/domain/entity"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/becosuke/golang-examples/hello/domain/entity"
 )
 
 func TestGetHello(t *testing.T) {

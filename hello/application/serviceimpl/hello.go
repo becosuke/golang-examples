@@ -9,18 +9,18 @@ import (
 	"github.com/becosuke/golang-examples/hello/domain/service"
 )
 
-func NewHelloService(cfg *config.Config, helloRepository repository.HelloRepository) service.HelloService {
-	return &helloServiceImpl{
-		config:          cfg,
-		helloRepository: helloRepository,
+func NewHello(cfg *config.Config, repository repository.Hello) service.Hello {
+	return &helloImpl{
+		config:     cfg,
+		repository: repository,
 	}
 }
 
-type helloServiceImpl struct {
-	config          *config.Config
-	helloRepository repository.HelloRepository
+type helloImpl struct {
+	config     *config.Config
+	repository repository.Hello
 }
 
-func (si *helloServiceImpl) GetHello(ctx context.Context) *entity.Hello {
-	return si.helloRepository.GetHello(ctx)
+func (si *helloImpl) Get(ctx context.Context) *entity.Hello {
+	return si.repository.Get(ctx)
 }
