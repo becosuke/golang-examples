@@ -1,8 +1,0 @@
-version: "2"
-
-services:
-  hello-server:
-    image: hello-server
-    container_name: hello-server
-    ports:
-      - "8080:8080"

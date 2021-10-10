@@ -1,0 +1,8 @@
+version: "2"
+
+services:
+  rest-server:
+    image: rest-server
+    container_name: rest-server
+    ports:
+      - "8080:8080"
