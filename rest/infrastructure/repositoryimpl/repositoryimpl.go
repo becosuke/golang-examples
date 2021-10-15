@@ -3,7 +3,7 @@ package repositoryimpl
 import (
 	"context"
 
-	"github.com/becosuke/golang-examples/rest/domain/model"
+	"github.com/becosuke/golang-examples/rest/domain/entity"
 	"github.com/becosuke/golang-examples/rest/domain/repository"
 	"github.com/becosuke/golang-examples/rest/infrastructure/syncmap"
 	"github.com/becosuke/golang-examples/rest/registry/config"
@@ -21,19 +21,19 @@ type repositoryImpl struct {
 	syncMap syncmap.SyncMap
 }
 
-func (impl *repositoryImpl) Create(ctx context.Context, key, value string) (*model.Model, error) {
+func (impl *repositoryImpl) Create(ctx context.Context, key, value string) (*entity.Entity, error) {
 	message, err := impl.syncMap.LoadOrStore(key, value)
-	return message.ConvertToModel(), err
+	return message.ConvertToEntity(), err
 }
 
-func (impl *repositoryImpl) Read(ctx context.Context, key string) (*model.Model, error) {
+func (impl *repositoryImpl) Read(ctx context.Context, key string) (*entity.Entity, error) {
 	message, err := impl.syncMap.Load(key)
-	return message.ConvertToModel(), err
+	return message.ConvertToEntity(), err
 }
 
-func (impl *repositoryImpl) Update(ctx context.Context, key, value string) (*model.Model, error) {
+func (impl *repositoryImpl) Update(ctx context.Context, key, value string) (*entity.Entity, error) {
 	message, err := impl.syncMap.Store(key, value)
-	return message.ConvertToModel(), err
+	return message.ConvertToEntity(), err
 }
 
 func (impl *repositoryImpl) Delete(ctx context.Context, key string) error {

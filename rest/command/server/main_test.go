@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/becosuke/golang-examples/rest/domain/model"
+	"github.com/becosuke/golang-examples/rest/domain/entity"
 	"github.com/becosuke/golang-examples/rest/registry/config"
 )
 
@@ -26,7 +26,7 @@ func TestGetConst(t *testing.T) {
 	}
 	t.Log(w.Body.String())
 
-	var res model.Model
+	var res entity.Entity
 	_ = json.Unmarshal([]byte(w.Body.String()), &res)
 	assert.Equal(t, config.ConstKey, res.GetKey())
 	assert.Equal(t, config.ConstValue, res.GetValue())
@@ -44,7 +44,7 @@ func TestPostConst(t *testing.T) {
 	}
 	t.Log(w.Body.String())
 
-	var res model.Model
+	var res entity.Entity
 	_ = json.Unmarshal([]byte(w.Body.String()), &res)
 	assert.Equal(t, config.ConstKey, res.GetKey())
 	assert.Equal(t, config.ConstValue, res.GetValue())
@@ -62,7 +62,7 @@ func TestPostAndGet(t *testing.T) {
 	}
 	t.Log(w.Body.String())
 
-	var res model.Model
+	var res entity.Entity
 	_ = json.Unmarshal([]byte(w.Body.String()), &res)
 	assert.Equal(t, "greeting", res.GetKey())
 	assert.Equal(t, "hello", res.GetValue())

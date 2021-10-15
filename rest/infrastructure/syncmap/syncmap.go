@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/becosuke/golang-examples/rest/domain/model"
+	"github.com/becosuke/golang-examples/rest/domain/entity"
 )
 
 func NewSyncMap() SyncMap {
@@ -56,8 +56,8 @@ type Message struct {
 	Value string
 }
 
-func (m *Message) ConvertToModel() *model.Model {
-	return &model.Model{
+func (m *Message) ConvertToEntity() *entity.Entity {
+	return &entity.Entity{
 		Key:   m.Key,
 		Value: m.Value,
 	}
