@@ -3,22 +3,22 @@ package controller
 import (
 	"net/http"
 
+	"github.com/becosuke/golang-examples/rest/application/usecase"
 	"github.com/becosuke/golang-examples/rest/registry/config"
-	"github.com/becosuke/golang-examples/rest/usecase"
 )
-
-func NewController(cfg *config.Config, u usecase.Usecase) Controller {
-	return &controllerImpl{
-		config:  cfg,
-		usecase: u,
-	}
-}
 
 type Controller interface {
 	Post(http.ResponseWriter, *http.Request)
 	Get(http.ResponseWriter, *http.Request)
 	Put(http.ResponseWriter, *http.Request)
 	Delete(http.ResponseWriter, *http.Request)
+}
+
+func NewController(config *config.Config, usecase usecase.Usecase) Controller {
+	return &controllerImpl{
+		config:  config,
+		usecase: usecase,
+	}
 }
 
 type controllerImpl struct {

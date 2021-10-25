@@ -20,7 +20,7 @@ func NewUsecase(cfg *config.Config, repository repository.Repository, processor 
 	return &usecaseImpl{
 		config:     cfg,
 		repository: repository,
-		processor:   processor,
+		processor:  processor,
 	}
 }
 

@@ -2,14 +2,15 @@ package repositoryimpl
 
 import (
 	"context"
+	"errors"
 
 	"github.com/becosuke/golang-examples/rest/domain/entity"
 	"github.com/becosuke/golang-examples/rest/domain/repository"
-	"github.com/becosuke/golang-examples/rest/infrastructure/syncmap"
+	"github.com/becosuke/golang-examples/rest/infrastructure/memorymap"
 	"github.com/becosuke/golang-examples/rest/registry/config"
 )
 
-func NewRepository(conf *config.Config, syncMap syncmap.SyncMap) repository.Repository {
+func NewRepository(conf *config.Config, syncMap memorymap.MemoryMap) repository.Repository {
 	return &repositoryImpl{
 		config:  conf,
 		syncMap: syncMap,
@@ -18,11 +19,14 @@ func NewRepository(conf *config.Config, syncMap syncmap.SyncMap) repository.Repo
 
 type repositoryImpl struct {
 	config  *config.Config
-	syncMap syncmap.SyncMap
+	syncMap memorymap.MemoryMap
 }
 
 func (impl *repositoryImpl) Create(ctx context.Context, key, value string) (*entity.Entity, error) {
-	message, err := impl.syncMap.LoadOrStore(key, value)
+	message, loaded, err := impl.syncMap.LoadOrStore(key, value)
+	if loaded {
+		return &entity.Entity{}, errors.New("already exists")
+	}
 	return message.ConvertToEntity(), err
 }
 

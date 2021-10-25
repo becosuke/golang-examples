@@ -1,25 +1,51 @@
-package main
+package handler
 
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/becosuke/golang-examples/rest/domain/entity"
 	"github.com/becosuke/golang-examples/rest/registry/config"
+	"github.com/becosuke/golang-examples/rest/registry/injector"
+
+	"github.com/stretchr/testify/assert"
 )
+
+var impl *handlerImpl
+
+func TestMain(m *testing.M) {
+	if err := setup(); err != nil {
+		log.Fatal(err)
+	}
+	ret := m.Run()
+	teardown()
+	os.Exit(ret)
+}
+
+func setup() error {
+	in := injector.NewInjector()
+	impl = &handlerImpl{
+		config:     in.InjectConfig(),
+		controller: in.InjectController(),
+	}
+	return nil
+}
+
+func teardown() {
+}
 
 func TestGetConst(t *testing.T) {
 	data := url.Values{config.KeyString: {config.ConstKey}}
 	req, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("%s?%s", config.Endpoint, data.Encode()), nil)
 	w := httptest.NewRecorder()
-	s.Route().ServeHTTP(w, req)
+	impl.route().ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("w.Code: %d", w.Code)
@@ -37,7 +63,7 @@ func TestPostConst(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, config.Endpoint, strings.NewReader(data.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
-	s.Route().ServeHTTP(w, req)
+	impl.route().ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("w.Code: %d", w.Code)
@@ -55,7 +81,7 @@ func TestPostAndGet(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, config.Endpoint, strings.NewReader(data.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	w := httptest.NewRecorder()
-	s.Route().ServeHTTP(w, req)
+	impl.route().ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("w.Code: %d", w.Code)
@@ -70,7 +96,7 @@ func TestPostAndGet(t *testing.T) {
 	data = url.Values{config.KeyString: {"greeting"}}
 	req, _ = http.NewRequest(http.MethodGet, fmt.Sprintf("%s?%s", config.Endpoint, data.Encode()), strings.NewReader(data.Encode()))
 	w = httptest.NewRecorder()
-	s.Route().ServeHTTP(w, req)
+	impl.route().ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
 		t.Errorf("w.Code: %d", w.Code)
