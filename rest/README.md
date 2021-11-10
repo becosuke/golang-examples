@@ -1,1 +1,22 @@
 # rest
+
+* adapter
+* command
+* presenter
+* controller
+* application
+* usecase
+* interactor
+* build
+* domain
+* entity
+* domainmodel
+* repository
+* domainservice
+* applicationservice
+* infrastructure
+* test
+* mock
+* gateway
+* view
+* viewmodel
