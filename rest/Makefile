@@ -9,13 +9,16 @@ CODE_DIRS ?= $(shell go list ./... | grep -v tests | grep -v mocks)
 TEST_DIRS ?= $(shell go list ./tests/...)
 LINT_DIRS ?= $(shell go list ./... | grep -v mocks)
 
-all: test build
+all: mod test build
 
 mod:
 	go mod vendor
 
 mod-tidy:
 	go mod tidy
+
+vet:
+	go vet ${CODE_DIRS}
 
 lint:
 	golangci-lint run $(args) ./...
@@ -30,9 +33,6 @@ imports:
 run:
 	go run ${PROJECT_REPOSITORY}/${COMMAND_PATH}
 
-vet:
-	go vet ${CODE_DIRS}
-
 .PHONY: test
 test: utest ftest
 
@@ -42,6 +42,11 @@ utest:
 ftest:
 	go test $(args) -race -cover $(TEST_DIRS)
 
+.PHONY: clean
+clean:
+	go clean
+	rm -f ${BUILD_DIR}/${COMMAND_NAME}
+
 .PHONY: build
 build: build-binary build-container
 
@@ -50,10 +55,6 @@ build-binary:
 
 build-container:
 	cd ${BUILD_DIR} && docker build . --no-cache --build-arg name=${COMMAND_NAME} -t ${PROJECT_NAME}-${COMMAND_NAME}:latest -t ${PROJECT_NAME}-${COMMAND_NAME}:$(shell date "+%Y%m%d%H%M%S")
-
-clean:
-	go clean
-	rm -f ${BUILD_DIR}/${COMMAND_NAME}
 
 .PHONY: mock
 mock:
