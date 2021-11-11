@@ -4,9 +4,12 @@ COMMAND_DIR=internal/cmd
 COMMAND_NAME=server
 COMMAND_PATH=${COMMAND_DIR}/${COMMAND_NAME}
 BUILD_DIR=build
-TEST_DIR=tests/functional
 
-all: src/test build
+CODE_DIRS ?= $(shell go list ./... | grep -v tests | grep -v mocks)
+TEST_DIRS ?= $(shell go list ./tests/...)
+LINT_DIRS ?= $(shell go list ./... | grep -v mocks)
+
+all: test build
 
 mod:
 	go mod vendor
@@ -14,22 +17,30 @@ mod:
 mod-tidy:
 	go mod tidy
 
-fmt:
-	sh -c "find . -type d \\( -name .git -o -name vendor -o -name protogen -o -name output \\) -prune -o -type f -name *.go -print | xargs -n1 goimports -w -local ${PROJECT_REPOSITORY}"
+lint:
+	golangci-lint run $(args) ./...
+	go-consistent $(cons_args) ${LINT_DIRS}
 
-vet:
-	sh -c "find . -type d \\( -name .git -o -name vendor -o -name protogen -o -name output \\) -prune -o -type d -print | xargs -IXXX sh -c 'find XXX -maxdepth 1 -type f -name *.go -print | xargs --no-run-if-empty go vet' || :"
+fmt:
+	@find . -iname "*.go" -not -path "./vendor/**" -not -path "./mocks/**" | xargs gofmt -w
+
+imports:
+	@find . -iname "*.go" -not -path "./vendor/**" -not -path "./mocks/**" | xargs goimports -w -local ${PROJECT_REPOSITORY}
 
 run:
 	go run ${PROJECT_REPOSITORY}/${COMMAND_PATH}
 
-test: test-unit test-functional
+vet:
+	go vet ${CODE_DIRS}
 
-test-unit:
-	go test -v ${PROJECT_REPOSITORY}/internal/...
+.PHONY: test
+test: utest ftest
 
-test-functional:
-	go test -v ${PROJECT_REPOSITORY}/${TEST_DIR}
+utest:
+	go test $(args) -race -cover ${CODE_DIRS}
+
+ftest:
+	go test $(args) -race -cover $(TEST_DIRS)
 
 .PHONY: build
 build: build-binary build-container
@@ -45,7 +56,7 @@ clean:
 	rm -f ${BUILD_DIR}/${COMMAND_NAME}
 
 .PHONY: mock
-gen-mock:
-	mockgen -source internal/usecases/interactor.go -destination tests/mocks/usercases/interactor.go -package usecases
-	mockgen -source internal/interfaces/repository/repository.go -destination tests/mocks/interfaces/repository/repository.go -package repository
-	mockgen -source internal/infrastructure/syncmap/syncmap.go -destination tests/mocks/infrastructure/syncmap/syncmap.go -package syncmap
+mock:
+	mockgen -source internal/usecases/interactor.go -destination mocks/usercases/interactor.go -package usecases
+	mockgen -source internal/interfaces/repository/repository.go -destination mocks/interfaces/repository/repository.go -package repository
+	mockgen -source internal/infrastructure/syncmap/syncmap.go -destination mocks/infrastructure/syncmap/syncmap.go -package syncmap

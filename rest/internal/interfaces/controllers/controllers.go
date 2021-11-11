@@ -39,7 +39,7 @@ func (impl *controllerImpl) Get(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write(res)
+	_, _ = w.Write(res)
 }
 
 func (impl *controllerImpl) Post(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +54,7 @@ func (impl *controllerImpl) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Location", r.Host+r.URL.Path+node.Key)
-	w.Write(res)
+	_, _ = w.Write(res)
 }
 
 func (impl *controllerImpl) Put(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +68,7 @@ func (impl *controllerImpl) Put(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write(res)
+	_, _ = w.Write(res)
 }
 
 func (impl *controllerImpl) Delete(w http.ResponseWriter, r *http.Request) {

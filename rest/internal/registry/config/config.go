@@ -7,7 +7,7 @@ import (
 const (
 	KeyString   = "key"
 	ValueString = "value"
-	Endpoint    = "/syncmap"
+	Endpoint    = "/node"
 )
 
 type Config struct {

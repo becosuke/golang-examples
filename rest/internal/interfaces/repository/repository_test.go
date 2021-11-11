@@ -10,7 +10,7 @@ import (
 	"github.com/becosuke/golang-examples/rest/internal/entities"
 	"github.com/becosuke/golang-examples/rest/internal/infrastructure/syncmap"
 	"github.com/becosuke/golang-examples/rest/internal/registry/config"
-	mock_syncmap "github.com/becosuke/golang-examples/rest/tests/mocks/infrastructure/syncmap"
+	mock_syncmap "github.com/becosuke/golang-examples/rest/mocks/infrastructure/syncmap"
 )
 
 func TestNewRepository(t *testing.T) {

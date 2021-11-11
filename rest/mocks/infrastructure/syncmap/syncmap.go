@@ -7,9 +7,8 @@ package syncmap
 import (
 	reflect "reflect"
 
-	gomock "github.com/golang/mock/gomock"
-
 	syncmap "github.com/becosuke/golang-examples/rest/internal/infrastructure/syncmap"
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockSyncMap is a mock of SyncMap interface.

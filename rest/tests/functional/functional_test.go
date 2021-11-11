@@ -30,7 +30,7 @@ func TestPost(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, w.Code)
 
 	var res entities.Node
-	err := json.Unmarshal([]byte(w.Body.String()), &res)
+	err := json.Unmarshal(w.Body.Bytes(), &res)
 	require.NoError(t, err)
 	node, err := in.InjectRepository().Read(context.Background(), entities.NewNodeKey("kkk"))
 	require.NoError(t, err)
@@ -51,7 +51,7 @@ func TestGet(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	var res entities.Node
-	err = json.Unmarshal([]byte(w.Body.String()), &res)
+	err = json.Unmarshal(w.Body.Bytes(), &res)
 	require.NoError(t, err)
 	assert.Equal(t, node.GetKey(), res.GetKey())
 	assert.Equal(t, node.GetValue(), res.GetValue())
@@ -69,7 +69,7 @@ func TestPut(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	var res entities.Node
-	err := json.Unmarshal([]byte(w.Body.String()), &res)
+	err := json.Unmarshal(w.Body.Bytes(), &res)
 	require.NoError(t, err)
 	node, err := in.InjectRepository().Read(context.Background(), entities.NewNodeKey("kkk"))
 	require.NoError(t, err)
