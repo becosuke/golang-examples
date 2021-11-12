@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package service;
+
+option go_package = "github.com/becosuke/tasks/v1/protogen/service";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
+
+service NodeService {
+  rpc CreateNode (CreateNodeRequest) returns (CreateNodeResponse) {
+    option (google.api.http) = {
+      post: "/v1/create_node"
+      body: "*"
+    };
+  }
+  rpc GetNode (GetNodeRequest) returns (GetNodeResponse) {
+    option (google.api.http) = {
+      post: "/v1/get_node"
+      body: "*"
+    };
+  }
+  rpc UpdateNode (UpdateNodeRequest) returns (UpdateNodeResponse) {
+    option (google.api.http) = {
+      put: "/v1/update_node"
+      body: "*"
+    };
+  }
+  rpc DeleteNode (DeleteNodeRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/delete_node"
+    };
+  }
+}
+
+message CreateNodeRequest {
+  Node node = 1 [(validate.rules).message.required = true];
+}
+message CreateNodeResponse {
+  Node node = 1;
+}
+message GetNodeRequest {
+  NodeKey node_key = 1 [(validate.rules).message.required = true];
+}
+message GetNodeResponse {
+  Node node = 1;
+}
+message UpdateNodeRequest {
+  Node node = 1 [(validate.rules).message.required = true];
+}
+message UpdateNodeResponse {
+  Node node = 1;
+}
+message DeleteNodeRequest {
+  NodeKey node_key = 1 [(validate.rules).message.required = true];
+}
+
+message Node {
+  string key = 1 [(validate.rules).string = {min_len:1, max_len:128}];
+  string value = 2 [(validate.rules).string = {min_len:1, max_len:128}];
+}
+message NodeKey {
+  string key = 1 [(validate.rules).string = {min_len:1, max_len:128}];
+}
