@@ -3,8 +3,8 @@ package server
 import (
 	"net/http"
 
-	"github.com/becosuke/golang-examples/grpc/internal/infrastructure/server/handler"
-	"github.com/becosuke/golang-examples/grpc/internal/registry/config"
+	"github.com/becosuke/golang-examples/kvstore/internal/infrastructure/server/handler"
+	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
 )
 
 type Server interface {

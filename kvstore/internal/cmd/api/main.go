@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/becosuke/golang-examples/grpc/internal/protogen"
-	"github.com/becosuke/golang-examples/grpc/internal/registry/injector"
+	"github.com/becosuke/golang-examples/kvstore/internal/protogen"
+	"github.com/becosuke/golang-examples/kvstore/internal/registry/injector"
 	"google.golang.org/grpc"
 )
 

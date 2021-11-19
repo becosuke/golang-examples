@@ -1,0 +1,6 @@
+[submodule "kvstore/modules/protoc-gen-validate"]
+	path = kvstore/modules/github.com/envoyproxy/protoc-gen-validate
+	url = git@github.com:envoyproxy/protoc-gen-validate.git
+[submodule "kvstore/modules/github.com/googleapis/googleapis"]
+	path = kvstore/modules/github.com/googleapis/googleapis
+	url = git@github.com:googleapis/googleapis.git
