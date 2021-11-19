@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package service;
 
-option go_package = "github.com/becosuke/tasks/v1/protogen/service";
+option go_package = "github.com/becosuke/tasks/v1/protogen";
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";

@@ -2,11 +2,11 @@
 // source: node.proto
 
 /*
-Package service is a reverse proxy.
+Package protogen is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package service
+package protogen
 
 import (
 	"context"

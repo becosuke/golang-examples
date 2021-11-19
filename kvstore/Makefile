@@ -70,3 +70,8 @@ protoc:
 	--grpc-gateway_out internal/protogen --grpc-gateway_opt paths=source_relative \
 	--validate_out "lang=go,paths=source_relative:internal/protogen" \
 	protobuf/kvstore.proto
+
+mock:
+	mockgen -source internal/usecases/interactor.go -destination internal/mocks/usercases/interactor.go -package usecases
+	mockgen -source internal/adapters/repository/repository.go -destination internal/mocks/adapters/repository/repository.go -package repository
+	mockgen -source internal/infrastructure/syncmap/syncmap.go -destination internal/mocks/infrastructure/syncmap/syncmap.go -package syncmap
