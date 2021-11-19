@@ -62,16 +62,16 @@ build-container:
 	cd ${BUILD_DIR} && docker build . --no-cache --build-arg name=${COMMAND_NAME} -t ${PROJECT_NAME}-${COMMAND_NAME}:latest -t ${PROJECT_NAME}-${COMMAND_NAME}:$(shell date "+%Y%m%d%H%M%S")
 
 protoc:
-	protoc -I protobuf -I $(shell brew --prefix)/opt/protobuf/include \
+	protoc -I internal/protobuf -I $(shell brew --prefix)/opt/protobuf/include \
 	-I modules/github.com/googleapis/googleapis \
 	-I modules/github.com/envoyproxy/protoc-gen-validate \
 	--go_out internal/protogen --go_opt paths=source_relative \
 	--go-grpc_out internal/protogen --go-grpc_opt paths=source_relative \
 	--grpc-gateway_out internal/protogen --grpc-gateway_opt paths=source_relative \
 	--validate_out "lang=go,paths=source_relative:internal/protogen" \
-	protobuf/kvstore.proto
+	internal/protobuf/kvstore.proto
 
 mock:
-	mockgen -source internal/usecases/interactor.go -destination internal/mocks/usercases/interactor.go -package usecases
-	mockgen -source internal/adapters/repository/repository.go -destination internal/mocks/adapters/repository/repository.go -package repository
-	mockgen -source internal/infrastructure/syncmap/syncmap.go -destination internal/mocks/infrastructure/syncmap/syncmap.go -package syncmap
+	mockgen -source internal/usecase/interactor.go -destination internal/mock/usecase/interactor.go -package usecase
+	mockgen -source internal/adapter/repository/repository.go -destination internal/mock/adapter/repository/repository.go -package repository
+	mockgen -source internal/infrastructure/syncmap/syncmap.go -destination internal/mock/infrastructure/syncmap/syncmap.go -package syncmap

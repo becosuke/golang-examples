@@ -17,18 +17,18 @@ service KVStoreService {
   }
   rpc GetPack (GetPackRequest) returns (GetPackResponse) {
     option (google.api.http) = {
-      get: "/v1/pack/{key}"
+      get: "/v1/pack/{seal.key}"
     };
   }
   rpc UpdatePack (UpdatePackRequest) returns (UpdatePackResponse) {
     option (google.api.http) = {
-      put: "/v1/pack/{key}"
+      put: "/v1/pack/{pack.key}"
       body: "*"
     };
   }
   rpc DeletePack (DeletePackRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/v1/pack/{key}"
+      delete: "/v1/pack/{seal.key}"
     };
   }
 }

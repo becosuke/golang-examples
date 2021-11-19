@@ -1,16 +1,14 @@
-package usecases
+package usecase
 
 import (
 	"context"
-	"github.com/becosuke/golang-examples/grpc/internal/entities/node"
-	mock_repository "github.com/becosuke/golang-examples/grpc/internal/mocks/adapters/repository"
-	"testing"
-
+	"github.com/becosuke/golang-examples/kvstore/internal/adapter/repository"
+	"github.com/becosuke/golang-examples/kvstore/internal/entity/kv"
+	mock_repository "github.com/becosuke/golang-examples/kvstore/internal/mock/adapter/repository"
+	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/becosuke/golang-examples/grpc/internal/adapters/repository"
-	"github.com/becosuke/golang-examples/grpc/internal/registry/config"
+	"testing"
 )
 
 func TestNewInteractor(t *testing.T) {
@@ -37,13 +35,13 @@ func TestInteractorImpl_Create(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	node := node.NewKeyValueNode("kkk", "vvv")
-	mockRepository.EXPECT().Create(gomock.Eq(ctx), gomock.Eq(node)).Return(node, nil)
+	pack := kv.NewPack("kkk", "vvv")
+	mockRepository.EXPECT().Create(gomock.Eq(ctx), gomock.Eq(pack)).Return(pack, nil)
 
-	res, err := SUT.Create(ctx, node)
+	res, err := SUT.Create(ctx, pack)
 
-	assert.Equal(t, node.Key, res.Key)
-	assert.Equal(t, node.Value, res.Value)
+	assert.Equal(t, pack.Key, res.Key)
+	assert.Equal(t, pack.Value, res.Value)
 	assert.NoError(t, err)
 }
 
@@ -58,14 +56,14 @@ func TestInteractorImpl_Read(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	node := node.NewKeyValueNode("kkk", "vvv")
-	nodeKey := node.NewNodeKey("kkk")
-	mockRepository.EXPECT().Read(gomock.Eq(ctx), gomock.Eq(nodeKey)).Return(node, nil)
+	pack := kv.NewPack("kkk", "vvv")
+	packKey := kv.NewSeal("kkk")
+	mockRepository.EXPECT().Read(gomock.Eq(ctx), gomock.Eq(packKey)).Return(pack, nil)
 
-	res, err := SUT.Read(ctx, nodeKey)
+	res, err := SUT.Read(ctx, packKey)
 
-	assert.Equal(t, node.Key, res.Key)
-	assert.Equal(t, node.Value, res.Value)
+	assert.Equal(t, pack.Key, res.Key)
+	assert.Equal(t, pack.Value, res.Value)
 	assert.NoError(t, err)
 }
 
@@ -80,13 +78,13 @@ func TestInteractorImpl_Update(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	node := node.NewKeyValueNode("kkk", "vvv")
-	mockRepository.EXPECT().Update(gomock.Eq(ctx), gomock.Eq(node)).Return(node, nil)
+	pack := kv.NewPack("kkk", "vvv")
+	mockRepository.EXPECT().Update(gomock.Eq(ctx), gomock.Eq(pack)).Return(pack, nil)
 
-	res, err := SUT.Update(ctx, node)
+	res, err := SUT.Update(ctx, pack)
 
-	assert.Equal(t, node.Key, res.Key)
-	assert.Equal(t, node.Value, res.Value)
+	assert.Equal(t, pack.Key, res.Key)
+	assert.Equal(t, pack.Value, res.Value)
 	assert.NoError(t, err)
 
 }
@@ -102,10 +100,10 @@ func TestInteractorImpl_Delete(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	nodeKey := node.NewKey("kkk")
-	mockRepository.EXPECT().Delete(gomock.Eq(ctx), gomock.Eq(nodeKey)).Return(nil)
+	packKey := kv.NewSeal("kkk")
+	mockRepository.EXPECT().Delete(gomock.Eq(ctx), gomock.Eq(packKey)).Return(nil)
 
-	err := SUT.Delete(ctx, nodeKey)
+	err := SUT.Delete(ctx, packKey)
 
 	assert.NoError(t, err)
 }

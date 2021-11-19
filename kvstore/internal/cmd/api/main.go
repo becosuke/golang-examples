@@ -8,8 +8,9 @@ import (
 
 func main() {
 	grpcServer := grpc.NewServer()
+	go grpcServer.Serve()
+	grpcServer.GracefulStop()
 
-	nodeServer := newNodeServer
 
 	nodeService, err := node.New()
 	if err != nil {

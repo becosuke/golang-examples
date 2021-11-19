@@ -1,4 +1,4 @@
-package pack
+package kv
 
 type Pack struct {
 	Key   string `json:"key"`

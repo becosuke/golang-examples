@@ -1,9 +1,9 @@
-package server
+package api
 
 import (
 	"net/http"
 
-	"github.com/becosuke/golang-examples/kvstore/internal/infrastructure/server/handler"
+	"github.com/becosuke/golang-examples/kvstore/internal/infrastructure/api/handler"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
 )
 

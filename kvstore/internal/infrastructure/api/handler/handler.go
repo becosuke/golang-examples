@@ -5,15 +5,15 @@ import (
 
 	"net/http"
 
-	"github.com/becosuke/golang-examples/grpc/internal/adapters/controllers"
-	"github.com/becosuke/golang-examples/grpc/internal/registry/config"
+	"github.com/becosuke/golang-examples/kvstore/internal/adapter/controller"
+	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
 )
 
 type Handler interface {
 	Route() *http.ServeMux
 }
 
-func NewHandler(config *config.Config, controller controllers.Controller) Handler {
+func NewHandler(config *config.Config, controller controller.Controller) Handler {
 	return &handlerImpl{
 		config:     config,
 		controller: controller,
@@ -22,7 +22,7 @@ func NewHandler(config *config.Config, controller controllers.Controller) Handle
 
 type handlerImpl struct {
 	config     *config.Config
-	controller controllers.Controller
+	controller controller.Controller
 	once       sync.Once
 	mux        *http.ServeMux
 }

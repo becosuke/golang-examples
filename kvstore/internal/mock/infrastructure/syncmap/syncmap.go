@@ -7,7 +7,7 @@ package syncmap
 import (
 	reflect "reflect"
 
-	syncmap "github.com/becosuke/golang-examples/grpc/internal/infrastructure/syncmap"
+	syncmap "github.com/becosuke/golang-examples/kvstore/internal/infrastructure/syncmap"
 	gomock "github.com/golang/mock/gomock"
 )
 
