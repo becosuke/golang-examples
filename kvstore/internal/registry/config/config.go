@@ -7,7 +7,7 @@ import (
 const (
 	KeyString   = "key"
 	ValueString = "value"
-	Endpoint    = "/node"
+	Endpoint    = "/kvstore"
 )
 
 type Config struct {

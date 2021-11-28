@@ -2,9 +2,8 @@ package usecase
 
 import (
 	"context"
-	"github.com/becosuke/golang-examples/kvstore/internal/adapter/repository"
-	"github.com/becosuke/golang-examples/kvstore/internal/entity/kv"
-	mock_repository "github.com/becosuke/golang-examples/kvstore/internal/mock/adapter/repository"
+	"github.com/becosuke/golang-examples/kvstore/internal/adapters/repository"
+	"github.com/becosuke/golang-examples/kvstore/internal/domain/entity"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -35,7 +34,7 @@ func TestInteractorImpl_Create(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	pack := kv.NewPack("kkk", "vvv")
+	pack := entity.NewPack("kkk", "vvv")
 	mockRepository.EXPECT().Create(gomock.Eq(ctx), gomock.Eq(pack)).Return(pack, nil)
 
 	res, err := SUT.Create(ctx, pack)
@@ -56,8 +55,8 @@ func TestInteractorImpl_Read(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	pack := kv.NewPack("kkk", "vvv")
-	packKey := kv.NewSeal("kkk")
+	pack := entity.NewPack("kkk", "vvv")
+	packKey := entity.NewSeal("kkk")
 	mockRepository.EXPECT().Read(gomock.Eq(ctx), gomock.Eq(packKey)).Return(pack, nil)
 
 	res, err := SUT.Read(ctx, packKey)
@@ -78,7 +77,7 @@ func TestInteractorImpl_Update(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	pack := kv.NewPack("kkk", "vvv")
+	pack := entity.NewPack("kkk", "vvv")
 	mockRepository.EXPECT().Update(gomock.Eq(ctx), gomock.Eq(pack)).Return(pack, nil)
 
 	res, err := SUT.Update(ctx, pack)
@@ -100,7 +99,7 @@ func TestInteractorImpl_Delete(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	packKey := kv.NewSeal("kkk")
+	packKey := entity.NewSeal("kkk")
 	mockRepository.EXPECT().Delete(gomock.Eq(ctx), gomock.Eq(packKey)).Return(nil)
 
 	err := SUT.Delete(ctx, packKey)
