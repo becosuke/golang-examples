@@ -1,7 +1,9 @@
 package config
 
 import (
+	"go.uber.org/zap/zapcore"
 	"os"
+	"strconv"
 )
 
 const (
@@ -29,9 +31,10 @@ type constConfig struct {
 }
 
 type envConfig struct {
-	Environment string
-	LogLevel    string
-	HttpPort    string
+	Environment Environment
+	LogLevel    zapcore.Level
+	GrpcPort    int
+	HttpPort    int
 }
 
 func newConstConfig() constConfig {
@@ -43,22 +46,44 @@ func newConstConfig() constConfig {
 }
 
 func newEnvConfig() envConfig {
-	environment, ok := os.LookupEnv("ENVIRONMENT")
+	environmentString, ok := os.LookupEnv("ENVIRONMENT")
 	if !ok {
-		environment = "development"
+		environmentString = "development"
 	}
-	logLevel, ok := os.LookupEnv("LOG_LEVEL")
-	if !ok {
-		logLevel = "info"
+	environment := NewEnvironment(environmentString)
+	if environment == EnvUnknown {
+		environment = EnvDevelopment
 	}
-	httpPort, ok := os.LookupEnv("HTTP_PORT")
+
+	logLevelString, ok := os.LookupEnv("LOG_LEVEL")
 	if !ok {
-		httpPort = "8080"
+		logLevelString = "info"
+	}
+	logLevel := zapcore.InfoLevel
+	_ = logLevel.Set(logLevelString)
+
+	grpcPortString, ok := os.LookupEnv("GRPC_PORT")
+	if !ok {
+		grpcPortString = "50051"
+	}
+	grpcPort, err := strconv.Atoi(grpcPortString)
+	if err != nil {
+		grpcPort = 50051
+	}
+
+	httpPortString, ok := os.LookupEnv("HTTP_PORT")
+	if !ok {
+		httpPortString = "50080"
+	}
+	httpPort, err := strconv.Atoi(httpPortString)
+	if err != nil {
+		httpPort = 50080
 	}
 
 	return envConfig{
 		Environment: environment,
 		LogLevel:    logLevel,
+		GrpcPort:    grpcPort,
 		HttpPort:    httpPort,
 	}
 }

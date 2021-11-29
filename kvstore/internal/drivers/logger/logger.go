@@ -5,7 +5,17 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func NewLogger(level zapcore.Level, serviceName, environment, version string) (*zap.Logger, error) {
+type Logger interface {
+	Info(msg string, fields ...zap.Field)
+	Warn(msg string, fields ...zap.Field)
+	Error(msg string, fields ...zap.Field)
+	DPanic(msg string, fields ...zap.Field)
+	Panic(msg string, fields ...zap.Field)
+	Fatal(msg string, fields ...zap.Field)
+	Sync() error
+}
+
+func NewLogger(level zapcore.Level, serviceName, version, environment string) (Logger, error) {
 	config := zap.NewProductionConfig()
 	config.Level = zap.NewAtomicLevelAt(level)
 	config.DisableStacktrace = true
@@ -14,12 +24,12 @@ func NewLogger(level zapcore.Level, serviceName, environment, version string) (*
 	config.ErrorOutputPaths = []string{"stderr"}
 	config.InitialFields = map[string]interface{}{
 		"service": serviceName,
-		"env":     environment,
 		"version": version,
+		"env":     environment,
 	}
 	return config.Build()
 }
 
-func NewDiscard() *zap.Logger {
+func NewFakeLogger() Logger {
 	return zap.NewNop()
 }

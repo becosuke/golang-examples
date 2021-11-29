@@ -5,20 +5,20 @@ import (
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/boundary"
 	"github.com/becosuke/golang-examples/kvstore/internal/pb"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
-	"github.com/becosuke/golang-examples/kvstore/internal/usecase"
+	"github.com/becosuke/golang-examples/kvstore/internal/usecases/interactor"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type kvstoreServiceServerImpl struct {
 	pb.UnimplementedKVStoreServiceServer
-	conf       *config.Config
-	interactor usecase.Interactor
+	config     *config.Config
+	interactor interactor.Interactor
 	boundary   boundary.Boundary
 }
 
-func NewKVStoreServiceServer(config *config.Config, interactor usecase.Interactor, boundary boundary.Boundary) pb.KVStoreServiceServer {
+func NewKVStoreServiceServer(config *config.Config, interactor interactor.Interactor, boundary boundary.Boundary) pb.KVStoreServiceServer {
 	return &kvstoreServiceServerImpl{
-		conf:       config,
+		config:     config,
 		interactor: interactor,
 		boundary:   boundary,
 	}

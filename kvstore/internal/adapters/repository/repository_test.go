@@ -5,6 +5,7 @@ import (
 	"github.com/becosuke/golang-examples/kvstore/internal/domain/entity"
 	"github.com/becosuke/golang-examples/kvstore/internal/drivers/syncmap"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
+	mock_syncmap "github.com/becosuke/golang-examples/kvstore/mock/drivers/syncmap"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -15,7 +16,7 @@ func TestNewRepository(t *testing.T) {
 	defer ctrl.Finish()
 
 	conf := config.NewConfig()
-	mockSyncmap := mock_syncmap.NewMockSyncMap(ctrl)
+	mockSyncmap := mock_syncmap.NewMockSyncmap(ctrl)
 	SUT := NewRepository(conf, mockSyncmap)
 
 	assert.Implements(t, (*Repository)(nil), SUT)
@@ -26,7 +27,7 @@ func TestRepositoryImpl_Create(t *testing.T) {
 	defer ctrl.Finish()
 
 	conf := config.NewConfig()
-	mockSyncmap := mock_syncmap.NewMockSyncMap(ctrl)
+	mockSyncmap := mock_syncmap.NewMockSyncmap(ctrl)
 	SUT := NewRepository(conf, mockSyncmap)
 
 	pack := entity.NewPack("kkk", "vvv")
@@ -46,7 +47,7 @@ func TestRepositoryImpl_Read(t *testing.T) {
 	defer ctrl.Finish()
 
 	conf := config.NewConfig()
-	mockSyncmap := mock_syncmap.NewMockSyncMap(ctrl)
+	mockSyncmap := mock_syncmap.NewMockSyncmap(ctrl)
 	SUT := NewRepository(conf, mockSyncmap)
 
 	seal := entity.NewSeal("kkk")
@@ -65,7 +66,7 @@ func TestRepositoryImpl_Update(t *testing.T) {
 	defer ctrl.Finish()
 
 	conf := config.NewConfig()
-	mockSyncmap := mock_syncmap.NewMockSyncMap(ctrl)
+	mockSyncmap := mock_syncmap.NewMockSyncmap(ctrl)
 	SUT := NewRepository(conf, mockSyncmap)
 
 	pack := entity.NewPack("kkk", "vvv")
@@ -85,7 +86,7 @@ func TestRepositoryImpl_Delete(t *testing.T) {
 	defer ctrl.Finish()
 
 	conf := config.NewConfig()
-	mockSyncmap := mock_syncmap.NewMockSyncMap(ctrl)
+	mockSyncmap := mock_syncmap.NewMockSyncmap(ctrl)
 	SUT := NewRepository(conf, mockSyncmap)
 
 	packKey := entity.NewSeal("kkk")

@@ -4,118 +4,145 @@ import (
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/boundary"
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/controller"
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/repository"
+	"github.com/becosuke/golang-examples/kvstore/internal/drivers/grpcserver"
+	"github.com/becosuke/golang-examples/kvstore/internal/drivers/logger"
 	"github.com/becosuke/golang-examples/kvstore/internal/drivers/syncmap"
 	"github.com/becosuke/golang-examples/kvstore/internal/pb"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
-	"github.com/becosuke/golang-examples/kvstore/internal/usecase"
+	"github.com/becosuke/golang-examples/kvstore/internal/usecases/interactor"
 	"google.golang.org/grpc"
+	"log"
 	"sync"
 )
 
 type Injection interface {
 	InjectConfig() *config.Config
+	InjectLogger() logger.Logger
 	InjectGrpcServer() *grpc.Server
-	InjectKVStoreServiceServer() pb.KVStoreServiceServer
-	InjectUsecase() usecase.Interactor
+	InjectController() pb.KVStoreServiceServer
+	InjectUsecase() interactor.Interactor
 	InjectBoundary() boundary.Boundary
 	InjectRepository() repository.Repository
 	InjectSyncmap() syncmap.Syncmap
 }
 
-func NewInjection() Injection {
-	return &injectionImpl{}
+func NewInjection(serviceName, version string) Injection {
+	return &injectionImpl{serviceName: serviceName, version: version}
 }
 
 type injectionImpl struct {
 	container struct {
 		Config               *config.Config
+		Logger               logger.Logger
 		GrpcServer           *grpc.Server
 		KVStoreServiceServer pb.KVStoreServiceServer
-		Usecase              usecase.Interactor
+		Usecase              interactor.Interactor
 		Boundary             boundary.Boundary
 		Repository           repository.Repository
 		Syncmap              syncmap.Syncmap
 	}
-	store sync.Map
+	serviceName string
+	version     string
+	store       sync.Map
 }
 
-func (impl *injectionImpl) InjectGrpcServer() *grpc.Server {
-	actual, _ := impl.store.LoadOrStore("grpcserver", &sync.Once{})
+func (i *injectionImpl) InjectConfig() *config.Config {
+	actual, _ := i.store.LoadOrStore("config", &sync.Once{})
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			impl.container.GrpcServer = controller.NewGrpcServer()
+			i.container.Config = config.NewConfig()
 		})
 	}
-	return impl.container.GrpcServer
+	return i.container.Config
 }
 
-func (impl *injectionImpl) InjectKVStoreServiceServer() pb.KVStoreServiceServer {
-	actual, _ := impl.store.LoadOrStore("kvstoreserviceserver", &sync.Once{})
+func (i *injectionImpl) InjectLogger() logger.Logger {
+	actual, _ := i.store.LoadOrStore("logger", &sync.Once{})
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			impl.container.KVStoreServiceServer = controller.NewKVStoreServiceServer(
-				impl.InjectConfig(),
-				impl.InjectUsecase(),
-				impl.InjectBoundary(),
+			l, err := logger.NewLogger(
+				i.InjectConfig().LogLevel,
+				i.serviceName,
+				i.version,
+				i.InjectConfig().Environment.String(),
+			)
+			if err != nil {
+				log.Fatal(err)
+			}
+			i.container.Logger = l
+		})
+	}
+	return i.container.Logger
+}
+
+func (i *injectionImpl) InjectGrpcServer() *grpc.Server {
+	actual, _ := i.store.LoadOrStore("grpcServer", &sync.Once{})
+	once, ok := actual.(*sync.Once)
+	if ok {
+		once.Do(func() {
+			i.container.GrpcServer = grpcserver.NewGrpcServer()
+		})
+	}
+	return i.container.GrpcServer
+}
+
+func (i *injectionImpl) InjectController() pb.KVStoreServiceServer {
+	actual, _ := i.store.LoadOrStore("controller", &sync.Once{})
+	once, ok := actual.(*sync.Once)
+	if ok {
+		once.Do(func() {
+			i.container.KVStoreServiceServer = controller.NewKVStoreServiceServer(
+				i.InjectConfig(),
+				i.InjectUsecase(),
+				i.InjectBoundary(),
 			)
 		})
 	}
-	return impl.container.KVStoreServiceServer
+	return i.container.KVStoreServiceServer
 }
 
-func (impl *injectionImpl) InjectConfig() *config.Config {
-	actual, _ := impl.store.LoadOrStore("config", &sync.Once{})
+func (i *injectionImpl) InjectUsecase() interactor.Interactor {
+	actual, _ := i.store.LoadOrStore("interactor", &sync.Once{})
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			impl.container.Config = config.NewConfig()
+			i.container.Usecase = interactor.NewInteractor(i.InjectConfig(), i.InjectRepository())
 		})
 	}
-	return impl.container.Config
+	return i.container.Usecase
 }
 
-func (impl *injectionImpl) InjectUsecase() usecase.Interactor {
-	actual, _ := impl.store.LoadOrStore("interactor", &sync.Once{})
+func (i *injectionImpl) InjectBoundary() boundary.Boundary {
+	actual, _ := i.store.LoadOrStore("boundary", &sync.Once{})
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			impl.container.Usecase = usecase.NewInteractor(impl.InjectConfig(), impl.InjectRepository())
+			i.container.Boundary = boundary.NewBoundary()
 		})
 	}
-	return impl.container.Usecase
+	return i.container.Boundary
 }
 
-func (impl *injectionImpl) InjectBoundary() boundary.Boundary {
-	actual, _ := impl.store.LoadOrStore("boundary", &sync.Once{})
+func (i *injectionImpl) InjectRepository() repository.Repository {
+	actual, _ := i.store.LoadOrStore("repository", &sync.Once{})
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			impl.container.Boundary = boundary.NewBoundary()
+			i.container.Repository = repository.NewRepository(i.InjectConfig(), i.InjectSyncmap())
 		})
 	}
-	return impl.container.Boundary
+	return i.container.Repository
 }
 
-func (impl *injectionImpl) InjectRepository() repository.Repository {
-	actual, _ := impl.store.LoadOrStore("repository", &sync.Once{})
+func (i *injectionImpl) InjectSyncmap() syncmap.Syncmap {
+	actual, _ := i.store.LoadOrStore("syncmap", &sync.Once{})
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			impl.container.Repository = repository.NewRepository(impl.InjectConfig(), impl.InjectSyncmap())
+			i.container.Syncmap = syncmap.NewSyncMap()
 		})
 	}
-	return impl.container.Repository
-}
-
-func (impl *injectionImpl) InjectSyncmap() syncmap.Syncmap {
-	actual, _ := impl.store.LoadOrStore("syncmap", &sync.Once{})
-	once, ok := actual.(*sync.Once)
-	if ok {
-		once.Do(func() {
-			impl.container.Syncmap = syncmap.NewSyncMap()
-		})
-	}
-	return impl.container.Syncmap
+	return i.container.Syncmap
 }

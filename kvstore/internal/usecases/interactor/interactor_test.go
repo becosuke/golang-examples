@@ -1,10 +1,11 @@
-package usecase
+package interactor
 
 import (
 	"context"
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/repository"
 	"github.com/becosuke/golang-examples/kvstore/internal/domain/entity"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
+	mock_repository "github.com/becosuke/golang-examples/kvstore/mock/adapters/repository"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"

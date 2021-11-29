@@ -1,13 +1,15 @@
 PROJECT_REPOSITORY=github.com/becosuke/golang-examples/kvstore
 PROJECT_NAME=kvstore
 COMMAND_DIR=internal/cmd
-COMMAND_NAME=api
-COMMAND_PATH=${COMMAND_DIR}/${COMMAND_NAME}
 BUILD_DIR=build
 
 CODE_DIRS ?= $(shell go list ./internal/... | grep -v tests | grep -v mocks)
 TEST_DIRS ?= $(shell go list ./internal/tests/...)
 LINT_DIRS ?= $(shell go list ./internal/... | grep -v mocks)
+
+TIMESTAMP := $(shell date "+%Y%m%d%H%M%S")
+GIT_REF := $(shell git rev-parse --short=7 HEAD)
+VERSION ?= $(TIMESTAMP)-$(GIT_REF)
 
 all: mod test build
 
@@ -18,26 +20,33 @@ mod-tidy:
 	go mod tidy
 
 vet:
-	go vet ${CODE_DIRS}
+	go vet $(CODE_DIRS)
 
 lint:
 	golangci-lint run $(args) ./...
-	go-consistent $(cons_args) ${LINT_DIRS}
+	go-consistent $(cons_args) $(LINT_DIRS)
 
 fmt:
 	@find . -iname "*.go" -not -path "./vendor/**" -not -path "./mocks/**" | xargs gofmt -w
 
 imports:
-	@find . -iname "*.go" -not -path "./vendor/**" -not -path "./mocks/**" | xargs goimports -w -local ${PROJECT_REPOSITORY}
+	@find . -iname "*.go" -not -path "./vendor/**" -not -path "./mocks/**" | xargs goimports -w -local $(PROJECT_REPOSITORY)
 
-run:
-	go run ${PROJECT_REPOSITORY}/${COMMAND_PATH}
+run: run-api run-gateway
+
+run-api:
+	go run -ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-api" \
+	$(PROJECT_REPOSITORY)/$(COMMAND_PATH)/api
+
+run-gateway:
+	go run -ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
+	$(PROJECT_REPOSITORY)/$(COMMAND_PATH)/gateway
 
 .PHONY: test
 test: utest ftest
 
 utest:
-	go test $(args) -race -cover ${CODE_DIRS}
+	go test $(args) -race -cover $(CODE_DIRS)
 
 ftest:
 	go test $(args) -race -cover $(TEST_DIRS)
@@ -45,21 +54,33 @@ ftest:
 .PHONY: clean
 clean:
 	go clean
-	rm -f ${BUILD_DIR}/${COMMAND_NAME}
+	rm -f $(BUILD_DIR)/api $(BUILD_DIR)/gateway
+
+clean-test:
+	go clean -testcache
 
 .PHONY: build
-build: build-grpc build-rest
+build: build-binary
 
-build-grpc:
-	${PRECOMMAND} go build -a -installsuffix cgo -ldflags '-w' -o ${OUTPUT}/api ${GRPC_PATH}/main/main.go
-	cd ${OUTPUT} && docker build . --no-cache --build-arg name=kvstore-api -t kvstore-api:latest -t kvstore-api:${TIMESTAMP}
+build-binary: build-binary-api build-binary-gateway
 
-build-rest:
-	${PRECOMMAND} go build -a -installsuffix cgo -ldflags '-w' -o ${OUTPUT}/gateway ${REST_PATH}/main/main.go
-	cd ${OUTPUT} && docker build . --no-cache --build-arg name=kvstore-gateway -t kvstore-gateway:latest -t kvstore-gateway:${TIMESTAMP}
+build-binary-api:
+	go build -a -installsuffix cgo \
+	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-api" \
+	-o $(OUTPUT)/api $(COMMAND_PATH)/api/main.go
 
-build-container:
-	cd ${BUILD_DIR} && docker build . --no-cache --build-arg name=${COMMAND_NAME} -t ${PROJECT_NAME}-${COMMAND_NAME}:latest -t ${PROJECT_NAME}-${COMMAND_NAME}:$(shell date "+%Y%m%d%H%M%S")
+build-binary-gateway:
+	go build -a -installsuffix cgo \
+	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
+	-o $(OUTPUT)/gateway $(COMMAND_PATH)/gateway/main.go
+
+build-container-api:
+	cd $(BUILD_DIR) && \
+	docker build . --no-cache --build-arg name=$(PROJECT_NAME)-api -t $(PROJECT_NAME)-api:latest -t $(PROJECT_NAME)-api:$(VERSION)
+
+build-container-gateway:
+	cd $(BUILD_DIR) && \
+	docker build . --no-cache --build-arg name=$(PROJECT_NAME)-gateway -t $(PROJECT_NAME)-gateway:latest -t $(PROJECT_NAME)-gateway:$(VERSION)
 
 protoc:
 	protoc -I internal/protobuf -I $(shell brew --prefix)/opt/protobuf/include \
@@ -72,6 +93,6 @@ protoc:
 	internal/protobuf/kvstore.proto
 
 mock:
-	mockgen -source internal/usecase/interactor.go -destination internal/mock/usecase/interactor.go -package usecase
-	mockgen -source internal/adapter/repository/repository.go -destination internal/mock/adapter/repository/repository.go -package repository
-	mockgen -source internal/infrastructure/syncmap/syncmap.go -destination internal/mock/infrastructure/syncmap/syncmap.go -package syncmap
+	mockgen -source internal/usecases/interactor/interactor.go -destination mock/usecases/interactor/interactor.go -package interactor
+	mockgen -source internal/adapters/repository/repository.go -destination mock/adapters/repository/repository.go -package repository
+	mockgen -source internal/drivers/syncmap/syncmap.go        -destination mock/drivers/syncmap/syncmap.go        -package syncmap
