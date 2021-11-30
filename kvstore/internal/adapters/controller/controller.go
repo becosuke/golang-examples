@@ -31,6 +31,7 @@ func (i *kvstoreServiceServerImpl) CreatePack(ctx context.Context, req *pb.Creat
 	}
 	err = req.GetPack().Validate()
 	if err != nil {
+		return nil, err
 	}
 	pack, err := i.interactor.Create(ctx, i.boundary.PackResourceToDomain(req.GetPack()))
 	if err != nil {

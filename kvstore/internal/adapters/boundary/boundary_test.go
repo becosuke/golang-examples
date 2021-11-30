@@ -8,36 +8,36 @@ import (
 )
 
 func TestNewBoundary(t *testing.T) {
-	SUT := NewBoundary()
-	assert.Implements(t, (*Boundary)(nil), SUT)
+	boundary := NewBoundary()
+	assert.Implements(t, (*Boundary)(nil), boundary)
 }
 
 func TestBoundaryImpl_PackDomainToResource(t *testing.T) {
-	SUT := NewBoundary()
+	boundary := NewBoundary()
 	pack := entity.NewPack("test-key", "test-value")
-	resource := SUT.PackDomainToResource(pack)
+	resource := boundary.PackDomainToResource(pack)
 	assert.Equal(t, "test-key", resource.Key)
 	assert.Equal(t, "test-value", resource.Value)
 }
 
 func TestBoundaryImpl_PackResourceToDomain(t *testing.T) {
-	SUT := NewBoundary()
+	boundary := NewBoundary()
 	pack := &pb.Pack{Key: "test-key", Value: "test-value"}
-	domain := SUT.PackResourceToDomain(pack)
+	domain := boundary.PackResourceToDomain(pack)
 	assert.Equal(t, "test-key", domain.Key)
 	assert.Equal(t, "test-value", domain.Value)
 }
 
 func TestBoundaryImpl_SealDomainToResource(t *testing.T) {
-	SUT := NewBoundary()
+	boundary := NewBoundary()
 	seal := entity.NewSeal("test-key")
-	resource := SUT.SealDomainToResource(seal)
+	resource := boundary.SealDomainToResource(seal)
 	assert.Equal(t, "test-key", resource.Key)
 }
 
 func TestBoundaryImpl_SealResourceToDomain(t *testing.T) {
-	SUT := NewBoundary()
+	boundary := NewBoundary()
 	seal := &pb.Seal{Key: "test-key"}
-	domain := SUT.SealResourceToDomain(seal)
+	domain := boundary.SealResourceToDomain(seal)
 	assert.Equal(t, "test-key", domain.Key)
 }

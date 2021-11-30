@@ -3,9 +3,9 @@ PROJECT_NAME=kvstore
 COMMAND_DIR=internal/cmd
 BUILD_DIR=build
 
-CODE_DIRS ?= $(shell go list ./internal/... | grep -v tests | grep -v mocks)
-TEST_DIRS ?= $(shell go list ./internal/tests/...)
-LINT_DIRS ?= $(shell go list ./internal/... | grep -v mocks)
+CODE_DIRS ?= $(shell go list ./internal/... | grep -v pkg)
+TEST_DIRS ?= $(shell go list ./tests/...)
+LINT_DIRS ?= $(shell go list ./internal/... | grep -v pkg)
 
 TIMESTAMP := $(shell date "+%Y%m%d%H%M%S")
 GIT_REF := $(shell git rev-parse --short=7 HEAD)
@@ -23,7 +23,7 @@ vet:
 	go vet $(CODE_DIRS)
 
 lint:
-	golangci-lint run $(args) ./...
+	golangci-lint run $(args) ./internal/...
 	go-consistent $(cons_args) $(LINT_DIRS)
 
 fmt:
@@ -92,7 +92,7 @@ protoc:
 	--validate_out "lang=go,paths=source_relative:internal/protogen" \
 	internal/protobuf/kvstore.proto
 
-mock:
+mockgen:
 	mockgen -source internal/usecases/interactor/interactor.go -destination mock/usecases/interactor/interactor.go -package interactor
 	mockgen -source internal/adapters/repository/repository.go -destination mock/adapters/repository/repository.go -package repository
 	mockgen -source internal/drivers/syncmap/syncmap.go        -destination mock/drivers/syncmap/syncmap.go        -package syncmap

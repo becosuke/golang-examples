@@ -141,7 +141,7 @@ func (i *injectionImpl) InjectSyncmap() syncmap.Syncmap {
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			i.container.Syncmap = syncmap.NewSyncMap()
+			i.container.Syncmap = syncmap.NewSyncmap()
 		})
 	}
 	return i.container.Syncmap

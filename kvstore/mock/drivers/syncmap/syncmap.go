@@ -35,7 +35,7 @@ func (m *MockSyncmap) EXPECT() *MockSyncmapMockRecorder {
 }
 
 // Delete mocks base method.
-func (m *MockSyncmap) Delete(arg0 string) error {
+func (m *MockSyncmap) Delete(arg0 *syncmap.MessageKey) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0)
 	ret0, _ := ret[0].(error)
@@ -49,7 +49,7 @@ func (mr *MockSyncmapMockRecorder) Delete(arg0 interface{}) *gomock.Call {
 }
 
 // Load mocks base method.
-func (m *MockSyncmap) Load(arg0 string) (*syncmap.Message, error) {
+func (m *MockSyncmap) Load(arg0 *syncmap.MessageKey) (*syncmap.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Load", arg0)
 	ret0, _ := ret[0].(*syncmap.Message)
@@ -64,9 +64,9 @@ func (mr *MockSyncmapMockRecorder) Load(arg0 interface{}) *gomock.Call {
 }
 
 // LoadOrStore mocks base method.
-func (m *MockSyncmap) LoadOrStore(arg0, arg1 string) (*syncmap.Message, bool, error) {
+func (m *MockSyncmap) LoadOrStore(arg0 *syncmap.Message) (*syncmap.Message, bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LoadOrStore", arg0, arg1)
+	ret := m.ctrl.Call(m, "LoadOrStore", arg0)
 	ret0, _ := ret[0].(*syncmap.Message)
 	ret1, _ := ret[1].(bool)
 	ret2, _ := ret[2].(error)
@@ -74,22 +74,22 @@ func (m *MockSyncmap) LoadOrStore(arg0, arg1 string) (*syncmap.Message, bool, er
 }
 
 // LoadOrStore indicates an expected call of LoadOrStore.
-func (mr *MockSyncmapMockRecorder) LoadOrStore(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockSyncmapMockRecorder) LoadOrStore(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadOrStore", reflect.TypeOf((*MockSyncmap)(nil).LoadOrStore), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadOrStore", reflect.TypeOf((*MockSyncmap)(nil).LoadOrStore), arg0)
 }
 
 // Store mocks base method.
-func (m *MockSyncmap) Store(arg0, arg1 string) (*syncmap.Message, error) {
+func (m *MockSyncmap) Store(arg0 *syncmap.Message) (*syncmap.Message, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Store", arg0, arg1)
+	ret := m.ctrl.Call(m, "Store", arg0)
 	ret0, _ := ret[0].(*syncmap.Message)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Store indicates an expected call of Store.
-func (mr *MockSyncmapMockRecorder) Store(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockSyncmapMockRecorder) Store(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Store", reflect.TypeOf((*MockSyncmap)(nil).Store), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Store", reflect.TypeOf((*MockSyncmap)(nil).Store), arg0)
 }
