@@ -7,7 +7,7 @@ import (
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/injection"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
-	"log"
+	"google.golang.org/grpc/reflection"
 	"net"
 	"os"
 	"os/signal"
@@ -30,23 +30,19 @@ func main() {
 
 func process() int {
 	in := injection.NewInjection(serviceName, version)
-	conf := in.InjectConfig()
+	config := in.InjectConfig()
 	logger := in.InjectLogger()
-	defer func() {
-		err := logger.Sync()
-		if err != nil {
-			log.Print(err)
-		}
-	}()
+	defer logger.Sync()
 
 	grpcServer := in.InjectGrpcServer()
 	controller := in.InjectController()
 	pb.RegisterKVStoreServiceServer(grpcServer, controller)
+	reflection.Register(grpcServer)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	grpcLn, err := net.Listen("tcp", fmt.Sprintf(":%d", conf.GrpcPort))
+	grpcLn, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GrpcPort))
 	if err != nil {
 		logger.Error("failed to listen grpc port", zap.Error(err))
 		return exitError
@@ -54,6 +50,7 @@ func process() int {
 
 	wg, ctx := errgroup.WithContext(ctx)
 	wg.Go(func() error { return grpcServer.Serve(grpcLn) })
+	logger.Info("grpcServer listen", zap.Int("port", config.GrpcPort))
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGTERM, os.Interrupt)

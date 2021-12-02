@@ -35,12 +35,12 @@ imports:
 run: run-api run-gateway
 
 run-api:
-	go run -ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-api" \
-	$(PROJECT_REPOSITORY)/$(COMMAND_PATH)/api
+	go run -ldflags "-X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-api" \
+	$(PROJECT_REPOSITORY)/$(COMMAND_DIR)/api
 
 run-gateway:
-	go run -ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
-	$(PROJECT_REPOSITORY)/$(COMMAND_PATH)/gateway
+	go run -ldflags "-X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
+	$(PROJECT_REPOSITORY)/$(COMMAND_DIR)/gateway
 
 .PHONY: test
 test: utest ftest
@@ -67,12 +67,12 @@ build-binary: build-binary-api build-binary-gateway
 build-binary-api:
 	go build -a -installsuffix cgo \
 	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-api" \
-	-o $(OUTPUT)/api $(COMMAND_PATH)/api/main.go
+	-o $(BUILD_DIR)/api $(COMMAND_DIR)/api/main.go
 
 build-binary-gateway:
 	go build -a -installsuffix cgo \
 	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
-	-o $(OUTPUT)/gateway $(COMMAND_PATH)/gateway/main.go
+	-o $(BUILD_DIR)/gateway $(COMMAND_DIR)/gateway/main.go
 
 build-container-api:
 	cd $(BUILD_DIR) && \
@@ -93,6 +93,6 @@ protoc:
 	internal/protobuf/kvstore.proto
 
 mockgen:
-	mockgen -source internal/usecases/interactor/interactor.go -destination mock/usecases/interactor/interactor.go -package interactor
-	mockgen -source internal/adapters/repository/repository.go -destination mock/adapters/repository/repository.go -package repository
-	mockgen -source internal/drivers/syncmap/syncmap.go        -destination mock/drivers/syncmap/syncmap.go        -package syncmap
+	mockgen -source internal/usecases/interactor/interactor.go -destination mocks/usecases/interactor/interactor.go -package interactor
+	mockgen -source internal/adapters/repository/repository.go -destination mocks/adapters/repository/repository.go -package repository
+	mockgen -source internal/drivers/syncmap/syncmap.go        -destination mocks/drivers/syncmap/syncmap.go        -package syncmap
