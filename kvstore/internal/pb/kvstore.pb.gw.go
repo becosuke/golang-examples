@@ -2,7 +2,7 @@
 // source: kvstore.proto
 
 /*
-Package protogen is a reverse proxy.
+Package pb is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
@@ -285,7 +285,7 @@ func RegisterKVStoreServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/protogen.KVStoreService/CreatePack", runtime.WithHTTPPathPattern("/v1/pack"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.KVStoreService/CreatePack", runtime.WithHTTPPathPattern("/v1/pack"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -308,7 +308,7 @@ func RegisterKVStoreServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/protogen.KVStoreService/GetPack", runtime.WithHTTPPathPattern("/v1/pack/{seal.key}"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.KVStoreService/GetPack", runtime.WithHTTPPathPattern("/v1/pack/{seal.key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -331,7 +331,7 @@ func RegisterKVStoreServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/protogen.KVStoreService/UpdatePack", runtime.WithHTTPPathPattern("/v1/pack/{pack.key}"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.KVStoreService/UpdatePack", runtime.WithHTTPPathPattern("/v1/pack/{pack.key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -354,7 +354,7 @@ func RegisterKVStoreServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/protogen.KVStoreService/DeletePack", runtime.WithHTTPPathPattern("/v1/pack/{seal.key}"))
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.KVStoreService/DeletePack", runtime.WithHTTPPathPattern("/v1/pack/{seal.key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -416,7 +416,7 @@ func RegisterKVStoreServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/protogen.KVStoreService/CreatePack", runtime.WithHTTPPathPattern("/v1/pack"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.KVStoreService/CreatePack", runtime.WithHTTPPathPattern("/v1/pack"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -436,7 +436,7 @@ func RegisterKVStoreServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/protogen.KVStoreService/GetPack", runtime.WithHTTPPathPattern("/v1/pack/{seal.key}"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.KVStoreService/GetPack", runtime.WithHTTPPathPattern("/v1/pack/{seal.key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -456,7 +456,7 @@ func RegisterKVStoreServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/protogen.KVStoreService/UpdatePack", runtime.WithHTTPPathPattern("/v1/pack/{pack.key}"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.KVStoreService/UpdatePack", runtime.WithHTTPPathPattern("/v1/pack/{pack.key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -476,7 +476,7 @@ func RegisterKVStoreServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/protogen.KVStoreService/DeletePack", runtime.WithHTTPPathPattern("/v1/pack/{seal.key}"))
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/pb.KVStoreService/DeletePack", runtime.WithHTTPPathPattern("/v1/pack/{seal.key}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

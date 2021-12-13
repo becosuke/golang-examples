@@ -35,7 +35,7 @@ func NewKVStoreServiceClient(cc grpc.ClientConnInterface) KVStoreServiceClient {
 
 func (c *kVStoreServiceClient) CreatePack(ctx context.Context, in *CreatePackRequest, opts ...grpc.CallOption) (*CreatePackResponse, error) {
 	out := new(CreatePackResponse)
-	err := c.cc.Invoke(ctx, "/protogen.KVStoreService/CreatePack", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.KVStoreService/CreatePack", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (c *kVStoreServiceClient) CreatePack(ctx context.Context, in *CreatePackReq
 
 func (c *kVStoreServiceClient) GetPack(ctx context.Context, in *GetPackRequest, opts ...grpc.CallOption) (*GetPackResponse, error) {
 	out := new(GetPackResponse)
-	err := c.cc.Invoke(ctx, "/protogen.KVStoreService/GetPack", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.KVStoreService/GetPack", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (c *kVStoreServiceClient) GetPack(ctx context.Context, in *GetPackRequest, 
 
 func (c *kVStoreServiceClient) UpdatePack(ctx context.Context, in *UpdatePackRequest, opts ...grpc.CallOption) (*UpdatePackResponse, error) {
 	out := new(UpdatePackResponse)
-	err := c.cc.Invoke(ctx, "/protogen.KVStoreService/UpdatePack", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.KVStoreService/UpdatePack", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *kVStoreServiceClient) UpdatePack(ctx context.Context, in *UpdatePackReq
 
 func (c *kVStoreServiceClient) DeletePack(ctx context.Context, in *DeletePackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/protogen.KVStoreService/DeletePack", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.KVStoreService/DeletePack", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func _KVStoreService_CreatePack_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protogen.KVStoreService/CreatePack",
+		FullMethod: "/pb.KVStoreService/CreatePack",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KVStoreServiceServer).CreatePack(ctx, req.(*CreatePackRequest))
@@ -137,7 +137,7 @@ func _KVStoreService_GetPack_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protogen.KVStoreService/GetPack",
+		FullMethod: "/pb.KVStoreService/GetPack",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KVStoreServiceServer).GetPack(ctx, req.(*GetPackRequest))
@@ -155,7 +155,7 @@ func _KVStoreService_UpdatePack_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protogen.KVStoreService/UpdatePack",
+		FullMethod: "/pb.KVStoreService/UpdatePack",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KVStoreServiceServer).UpdatePack(ctx, req.(*UpdatePackRequest))
@@ -173,7 +173,7 @@ func _KVStoreService_DeletePack_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/protogen.KVStoreService/DeletePack",
+		FullMethod: "/pb.KVStoreService/DeletePack",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KVStoreServiceServer).DeletePack(ctx, req.(*DeletePackRequest))
@@ -185,7 +185,7 @@ func _KVStoreService_DeletePack_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var KVStoreService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "protogen.KVStoreService",
+	ServiceName: "pb.KVStoreService",
 	HandlerType: (*KVStoreServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
