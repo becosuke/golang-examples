@@ -25,10 +25,10 @@ var (
 )
 
 func main() {
-	os.Exit(process())
+	os.Exit(run())
 }
 
-func process() int {
+func run() int {
 	in := injection.NewInjection(serviceName, version)
 	config := in.InjectConfig()
 	logger := in.InjectLogger()

@@ -86,10 +86,10 @@ protoc:
 	protoc -I internal/protobuf -I $(shell brew --prefix)/opt/protobuf/include \
 	-I modules/github.com/googleapis/googleapis \
 	-I modules/github.com/envoyproxy/protoc-gen-validate \
-	--go_out internal/protogen --go_opt paths=source_relative \
-	--go-grpc_out internal/protogen --go-grpc_opt paths=source_relative \
-	--grpc-gateway_out internal/protogen --grpc-gateway_opt paths=source_relative \
-	--validate_out "lang=go,paths=source_relative:internal/protogen" \
+	--go_out internal/pb --go_opt paths=source_relative \
+	--go-grpc_out internal/pb --go-grpc_opt paths=source_relative \
+	--grpc-gateway_out internal/pb --grpc-gateway_opt paths=source_relative \
+	--validate_out "lang=go,paths=source_relative:internal/pb" \
 	internal/protobuf/kvstore.proto
 
 mockgen:
