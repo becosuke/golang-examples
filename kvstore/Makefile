@@ -27,10 +27,10 @@ lint:
 	go-consistent $(cons_args) $(LINT_DIRS)
 
 fmt:
-	@find . -iname "*.go" -not -path "./vendor/**" -not -path "./mocks/**" | xargs gofmt -w
+	@find ./internal -iname "*.go" -not -path "./pkg/**" | xargs gofmt -w
 
 imports:
-	@find . -iname "*.go" -not -path "./vendor/**" -not -path "./mocks/**" | xargs goimports -w -local $(PROJECT_REPOSITORY)
+	@find ./internal -iname "*.go" -not -path "./pkg/**" | xargs goimports -w -local $(PROJECT_REPOSITORY)
 
 run: run-api run-gateway
 
@@ -83,13 +83,13 @@ build-container-gateway:
 	docker build . --no-cache --build-arg name=$(PROJECT_NAME)-gateway -t $(PROJECT_NAME)-gateway:latest -t $(PROJECT_NAME)-gateway:$(VERSION)
 
 protoc:
-	protoc -I internal/protobuf -I $(shell brew --prefix)/opt/protobuf/include \
+	protoc -I proto -I $(shell brew --prefix)/opt/protobuf/include \
 	-I modules/github.com/googleapis/googleapis \
 	-I modules/github.com/envoyproxy/protoc-gen-validate \
-	--go_out internal/pb --go_opt paths=source_relative \
-	--go-grpc_out internal/pb --go-grpc_opt paths=source_relative \
-	--grpc-gateway_out internal/pb --grpc-gateway_opt paths=source_relative \
-	--validate_out "lang=go,paths=source_relative:internal/pb" \
+	--go_out pb --go_opt paths=source_relative \
+	--go-grpc_out pb --go-grpc_opt paths=source_relative \
+	--grpc-gateway_out pb --grpc-gateway_opt paths=source_relative \
+	--validate_out "lang=go,paths=source_relative:pb" \
 	internal/protobuf/kvstore.proto
 
 mockgen:
