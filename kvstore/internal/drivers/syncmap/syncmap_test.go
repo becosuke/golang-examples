@@ -36,8 +36,8 @@ func TestSyncmapImpl_LoadOrStore(t *testing.T) {
 	assert.True(t, loaded)
 	assert.NoError(t, err)
 
-	syncMap := sync.Map{}
-	syncMap.Store("kkk", 111)
+	syncMap := &sync.Map{}
+	syncMap.Store(Key("kkk"), 111)
 	syncmap = &syncmapImpl{syncmap: syncMap}
 	actual, loaded, err = syncmap.LoadOrStore(NewMessage("kkk", "vvv"))
 	assert.Nil(t, actual)
@@ -48,11 +48,11 @@ func TestSyncmapImpl_LoadOrStore(t *testing.T) {
 func TestSyncmapImpl_Load(t *testing.T) {
 	syncmap := NewSyncmap()
 
-	actual, err := syncmap.Load(nil)
+	actual, err := syncmap.Load("")
 	assert.Nil(t, actual)
 	assert.EqualError(t, err, errors.ErrSyncmapInvalidArgument.String())
 
-	messageKey := NewMessageKey("kkk")
+	messageKey := Key("kkk")
 	actual, err = syncmap.Load(messageKey)
 	assert.Nil(t, actual)
 	assert.EqualError(t, err, errors.ErrSyncmapNotFound.String())
@@ -66,10 +66,10 @@ func TestSyncmapImpl_Load(t *testing.T) {
 	assert.Equal(t, message.Value, actual.Value)
 	assert.NoError(t, err)
 
-	syncMap := sync.Map{}
-	syncMap.Store("kkk", 111)
+	syncMap := &sync.Map{}
+	syncMap.Store(Key("kkk"), 111)
 	syncmap = &syncmapImpl{syncmap: syncMap}
-	actual, err = syncmap.Load(NewMessageKey("kkk"))
+	actual, err = syncmap.Load(Key("kkk"))
 	assert.Nil(t, actual)
 	assert.EqualError(t, err, errors.ErrSyncmapInvalidData.String())
 }
@@ -97,18 +97,18 @@ func TestSyncmapImpl_Store(t *testing.T) {
 func TestSyncmapImpl_Delete(t *testing.T) {
 	syncmap := NewSyncmap()
 
-	err := syncmap.Delete(nil)
+	err := syncmap.Delete("")
 	assert.EqualError(t, err, errors.ErrSyncmapInvalidArgument.String())
 
 	message := NewMessage("kkk", "vvv")
 	_, err = syncmap.Store(message)
 	require.NoError(t, err)
 
-	messageKey := NewMessageKey("kkk")
+	messageKey := Key("kkk")
 	err = syncmap.Delete(messageKey)
 	assert.NoError(t, err)
 
-	messageKey = NewMessageKey("kkk")
+	messageKey = Key("kkk")
 	err = syncmap.Delete(messageKey)
 	assert.NoError(t, err)
 }

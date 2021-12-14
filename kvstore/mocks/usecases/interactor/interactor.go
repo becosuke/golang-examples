@@ -36,10 +36,10 @@ func (m *MockInteractor) EXPECT() *MockInteractorMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockInteractor) Create(arg0 context.Context, arg1 *entity.Stock) (*entity.Stock, error) {
+func (m *MockInteractor) Create(arg0 context.Context, arg1 *entity.Pack) (*entity.Pack, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", arg0, arg1)
-	ret0, _ := ret[0].(*entity.Stock)
+	ret0, _ := ret[0].(*entity.Pack)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -65,10 +65,10 @@ func (mr *MockInteractorMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Cal
 }
 
 // Read mocks base method.
-func (m *MockInteractor) Read(arg0 context.Context, arg1 *entity.Seal) (*entity.Stock, error) {
+func (m *MockInteractor) Read(arg0 context.Context, arg1 *entity.Seal) (*entity.Pack, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Read", arg0, arg1)
-	ret0, _ := ret[0].(*entity.Stock)
+	ret0, _ := ret[0].(*entity.Pack)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -80,10 +80,10 @@ func (mr *MockInteractorMockRecorder) Read(arg0, arg1 interface{}) *gomock.Call 
 }
 
 // Update mocks base method.
-func (m *MockInteractor) Update(arg0 context.Context, arg1 *entity.Stock) (*entity.Stock, error) {
+func (m *MockInteractor) Update(arg0 context.Context, arg1 *entity.Pack) (*entity.Pack, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1)
-	ret0, _ := ret[0].(*entity.Stock)
+	ret0, _ := ret[0].(*entity.Pack)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

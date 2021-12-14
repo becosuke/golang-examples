@@ -7,17 +7,19 @@ import (
 
 type Syncmap interface {
 	LoadOrStore(*Message) (*Message, bool, error)
-	Load(*MessageKey) (*Message, error)
+	Load(Key) (*Message, error)
 	Store(*Message) (*Message, error)
-	Delete(*MessageKey) error
+	Delete(Key) error
 }
 
 func NewSyncmap() Syncmap {
-	return &syncmapImpl{}
+	return &syncmapImpl{
+		syncmap: &sync.Map{},
+	}
 }
 
 type syncmapImpl struct {
-	syncmap sync.Map
+	syncmap *sync.Map
 }
 
 func (si *syncmapImpl) LoadOrStore(message *Message) (*Message, bool, error) {
@@ -26,7 +28,7 @@ func (si *syncmapImpl) LoadOrStore(message *Message) (*Message, bool, error) {
 	}
 	actual, loaded := si.syncmap.LoadOrStore(message.GetKey(), message.GetValue())
 	if loaded {
-		asserted, ok := actual.(string)
+		asserted, ok := actual.(Value)
 		if !ok {
 			return nil, loaded, errors.ErrSyncmapInvalidData
 		}
@@ -35,19 +37,19 @@ func (si *syncmapImpl) LoadOrStore(message *Message) (*Message, bool, error) {
 	return &Message{Key: message.GetKey(), Value: message.GetValue()}, loaded, nil
 }
 
-func (si *syncmapImpl) Load(key *MessageKey) (*Message, error) {
-	if key == nil {
+func (si *syncmapImpl) Load(key Key) (*Message, error) {
+	if key == "" {
 		return nil, errors.ErrSyncmapInvalidArgument
 	}
-	value, ok := si.syncmap.Load(key.GetKey())
+	value, ok := si.syncmap.Load(key)
 	if !ok {
 		return nil, errors.ErrSyncmapNotFound
 	}
-	asserted, ok := value.(string)
+	asserted, ok := value.(Value)
 	if !ok {
 		return nil, errors.ErrSyncmapInvalidData
 	}
-	return &Message{Key: key.GetKey(), Value: asserted}, nil
+	return &Message{Key: key, Value: asserted}, nil
 }
 
 func (si *syncmapImpl) Store(message *Message) (*Message, error) {
@@ -58,10 +60,10 @@ func (si *syncmapImpl) Store(message *Message) (*Message, error) {
 	return &Message{Key: message.GetKey(), Value: message.GetValue()}, nil
 }
 
-func (si *syncmapImpl) Delete(key *MessageKey) error {
-	if key == nil {
+func (si *syncmapImpl) Delete(key Key) error {
+	if key == "" {
 		return errors.ErrSyncmapInvalidArgument
 	}
-	si.syncmap.Delete(key.GetKey())
+	si.syncmap.Delete(key)
 	return nil
 }

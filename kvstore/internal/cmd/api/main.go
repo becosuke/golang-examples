@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/becosuke/golang-examples/kvstore/internal/pb"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/injection"
+	"github.com/becosuke/golang-examples/kvstore/pb"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/reflection"

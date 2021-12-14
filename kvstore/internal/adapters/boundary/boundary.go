@@ -2,7 +2,7 @@ package boundary
 
 import (
 	"github.com/becosuke/golang-examples/kvstore/internal/domain/entity"
-	"github.com/becosuke/golang-examples/kvstore/internal/pb"
+	"github.com/becosuke/golang-examples/kvstore/pb"
 )
 
 type Boundary interface {

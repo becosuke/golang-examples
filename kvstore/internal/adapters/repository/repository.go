@@ -27,26 +27,26 @@ type repositoryImpl struct {
 	store  syncmap.Syncmap
 }
 
-func (ri *repositoryImpl) Create(ctx context.Context, pack *entity.Pack) (*entity.Pack, error) {
-	message, loaded, err := ri.store.LoadOrStore(ri.ToMessage(pack))
+func (ri *repositoryImpl) Create(_ context.Context, pack *entity.Pack) (*entity.Pack, error) {
+	message, loaded, err := ri.store.LoadOrStore(ri.ToSyncmapMessage(pack))
 	if loaded {
 		return nil, errors.New("already exists")
 	}
 	return ri.ToEntity(message), err
 }
 
-func (ri *repositoryImpl) Read(ctx context.Context, seal *entity.Seal) (*entity.Pack, error) {
-	message, err := ri.store.Load(ri.ToMessageKey(seal))
+func (ri *repositoryImpl) Read(_ context.Context, seal *entity.Seal) (*entity.Pack, error) {
+	message, err := ri.store.Load(ri.ToSyncmapKey(seal))
 	return ri.ToEntity(message), err
 }
 
-func (ri *repositoryImpl) Update(ctx context.Context, pack *entity.Pack) (*entity.Pack, error) {
-	message, err := ri.store.Store(ri.ToMessage(pack))
+func (ri *repositoryImpl) Update(_ context.Context, pack *entity.Pack) (*entity.Pack, error) {
+	message, err := ri.store.Store(ri.ToSyncmapMessage(pack))
 	return ri.ToEntity(message), err
 }
 
-func (ri *repositoryImpl) Delete(ctx context.Context, seal *entity.Seal) error {
-	err := ri.store.Delete(ri.ToMessageKey(seal))
+func (ri *repositoryImpl) Delete(_ context.Context, seal *entity.Seal) error {
+	err := ri.store.Delete(ri.ToSyncmapKey(seal))
 	return err
 }
 
@@ -55,26 +55,24 @@ func (ri *repositoryImpl) ToEntity(m *syncmap.Message) *entity.Pack {
 		return &entity.Pack{}
 	}
 	return &entity.Pack{
-		Key:   m.GetKey(),
-		Value: m.GetValue(),
+		Key:   m.GetKey().String(),
+		Value: m.GetValue().String(),
 	}
 }
 
-func (ri *repositoryImpl) ToMessage(pack *entity.Pack) *syncmap.Message {
+func (ri *repositoryImpl) ToSyncmapMessage(pack *entity.Pack) *syncmap.Message {
 	if pack == nil {
 		return &syncmap.Message{}
 	}
 	return &syncmap.Message{
-		Key:   pack.GetKey(),
-		Value: pack.GetValue(),
+		Key:   syncmap.Key(pack.GetKey()),
+		Value: syncmap.Value(pack.GetValue()),
 	}
 }
 
-func (ri *repositoryImpl) ToMessageKey(seal *entity.Seal) *syncmap.MessageKey {
+func (ri *repositoryImpl) ToSyncmapKey(seal *entity.Seal) syncmap.Key {
 	if seal == nil {
-		return &syncmap.MessageKey{}
+		return ""
 	}
-	return &syncmap.MessageKey{
-		Key: seal.GetKey(),
-	}
+	return syncmap.Key(seal.GetKey())
 }

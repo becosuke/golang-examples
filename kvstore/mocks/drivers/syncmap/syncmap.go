@@ -35,7 +35,7 @@ func (m *MockSyncmap) EXPECT() *MockSyncmapMockRecorder {
 }
 
 // Delete mocks base method.
-func (m *MockSyncmap) Delete(arg0 *syncmap.MessageKey) error {
+func (m *MockSyncmap) Delete(arg0 syncmap.Key) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0)
 	ret0, _ := ret[0].(error)
@@ -49,7 +49,7 @@ func (mr *MockSyncmapMockRecorder) Delete(arg0 interface{}) *gomock.Call {
 }
 
 // Load mocks base method.
-func (m *MockSyncmap) Load(arg0 *syncmap.MessageKey) (*syncmap.Message, error) {
+func (m *MockSyncmap) Load(arg0 syncmap.Key) (*syncmap.Message, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Load", arg0)
 	ret0, _ := ret[0].(*syncmap.Message)

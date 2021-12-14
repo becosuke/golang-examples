@@ -92,7 +92,7 @@ protoc:
 	--validate_out "lang=go,paths=source_relative:pb" \
 	internal/protobuf/kvstore.proto
 
-mockgen:
+genmocks:
 	mockgen -source internal/usecases/interactor/interactor.go -destination mocks/usecases/interactor/interactor.go -package interactor
 	mockgen -source internal/adapters/repository/repository.go -destination mocks/adapters/repository/repository.go -package repository
 	mockgen -source internal/drivers/syncmap/syncmap.go        -destination mocks/drivers/syncmap/syncmap.go        -package syncmap

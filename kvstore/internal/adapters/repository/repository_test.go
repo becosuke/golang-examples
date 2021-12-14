@@ -5,7 +5,7 @@ import (
 	"github.com/becosuke/golang-examples/kvstore/internal/domain/entity"
 	"github.com/becosuke/golang-examples/kvstore/internal/drivers/syncmap"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
-	mock_syncmap "github.com/becosuke/golang-examples/kvstore/mock/drivers/syncmap"
+	mock_syncmap "github.com/becosuke/golang-examples/kvstore/mocks/drivers/syncmap"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -51,7 +51,7 @@ func TestRepositoryImpl_Read(t *testing.T) {
 	repository := NewRepository(conf, mockSyncmap)
 
 	seal := entity.NewSeal("kkk")
-	messageKey := syncmap.NewMessageKey("kkk")
+	messageKey := syncmap.Key("kkk")
 	message := syncmap.NewMessage("kkk", "vvv")
 	mockSyncmap.EXPECT().Load(gomock.Eq(messageKey)).Return(message, nil)
 
@@ -91,7 +91,7 @@ func TestRepositoryImpl_Delete(t *testing.T) {
 	repository := NewRepository(conf, mockSyncmap)
 
 	seal := entity.NewSeal("kkk")
-	messageKey := syncmap.NewMessageKey("kkk")
+	messageKey := syncmap.Key("kkk")
 	mockSyncmap.EXPECT().Delete(gomock.Eq(messageKey)).Return(nil)
 
 	ctx := context.Background()

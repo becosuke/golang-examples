@@ -3,9 +3,9 @@ package controller
 import (
 	"context"
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/boundary"
-	"github.com/becosuke/golang-examples/kvstore/internal/pb"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
 	"github.com/becosuke/golang-examples/kvstore/internal/usecases/interactor"
+	"github.com/becosuke/golang-examples/kvstore/pb"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
