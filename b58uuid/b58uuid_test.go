@@ -47,3 +47,15 @@ func TestOrigin_Hex(t *testing.T) {
 func TestOrigin_Base58(t *testing.T) {
 	assert.Equal(t, "HYUMBz2JqfF2wnfbU72hYA", origin.Base58())
 }
+
+func TestOrigin_Sha512(t *testing.T) {
+	assert.Equal(t, "913b13506dcd7bbfff09cb46202c24a8b0c7cc1824b1dec0250f5def573273e3c65a031a87930c0ec462fd629d991e5d020e570fb7a166f6aafccc2783672b26", fmt.Sprintf("%x", origin.Sha512()))
+}
+
+func TestOrigin_Sha512Hex(t *testing.T) {
+	assert.Equal(t, "913b13506dcd7bbfff09cb46202c24a8b0c7cc1824b1dec0250f5def573273e3c65a031a87930c0ec462fd629d991e5d020e570fb7a166f6aafccc2783672b26", origin.Sha512Hex())
+}
+
+func TestOrigin_Sha512Base58(t *testing.T) {
+	assert.Equal(t, "3uQoh7ZirdJhSWrE8Y3GxVyP4oLJgY6XPrviaurbsyEWmRLZHAKJjQ24HYyyY5mkzgBA81Kn1fAxjWjcchCGmaL5", origin.Sha512Base58())
+}
