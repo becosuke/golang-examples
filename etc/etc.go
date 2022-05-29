@@ -1,4 +1,4 @@
-package sw
+package etc
 
 import "fmt"
 
