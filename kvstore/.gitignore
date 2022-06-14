@@ -1,4 +1,3 @@
-/build/rest
-/build/grpc
-/vendor
+/build/*
+/vendor/*
 .idea

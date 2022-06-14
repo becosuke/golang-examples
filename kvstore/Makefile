@@ -32,53 +32,60 @@ fmt:
 imports:
 	@find ./internal -iname "*.go" -not -path "./pkg/**" | xargs goimports -w -local $(PROJECT_REPOSITORY)
 
-run: run-api run-gateway
+run: run-backend run-gateway
 
-run-api:
-	go run -ldflags "-X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-api" \
-	$(PROJECT_REPOSITORY)/$(COMMAND_DIR)/api
+run-backend:
+	go run -ldflags "-X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-backend" \
+	$(PROJECT_REPOSITORY)/$(COMMAND_DIR)/backend
 
 run-gateway:
 	go run -ldflags "-X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
 	$(PROJECT_REPOSITORY)/$(COMMAND_DIR)/gateway
 
 .PHONY: test
-test: utest ftest
+test: unit-test functional-test
 
-utest:
+unit-test:
 	go test $(args) -race -cover $(CODE_DIRS)
 
-ftest:
+functional-test:
 	go test $(args) -race -cover $(TEST_DIRS)
 
 .PHONY: clean
 clean:
 	go clean
-	rm -f $(BUILD_DIR)/api $(BUILD_DIR)/gateway
+	rm -f $(BUILD_DIR)/backend $(BUILD_DIR)/gateway
 
 clean-test:
 	go clean -testcache
 
 .PHONY: build
-build: build-binary
+build: update-build-dependencies build-backend build-gateway
 
-build-binary: build-binary-api build-binary-gateway
+update-build-dependencies:
+	docker run --rm -v $(shell pwd):/root golang:1.18.0-alpine sh -c 'cp /usr/local/go/lib/time/zoneinfo.zip /root/build/zoneinfo.zip && cp /etc/ssl/certs/ca-certificates.crt /root/build/ca-certificates.crt'
 
-build-binary-api:
-	go build -a -installsuffix cgo \
-	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-api" \
-	-o $(BUILD_DIR)/api $(COMMAND_DIR)/api/main.go
+.PHONY: build-backend
+build-backend: build-backend-binary build-backend-container
 
-build-binary-gateway:
-	go build -a -installsuffix cgo \
+.PHONY: build-gateway
+build-gateway: build-gateway-binary build-gateway-container
+
+build-backend-binary:
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo \
+	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-backend" \
+	-o $(BUILD_DIR)/$(PROJECT_NAME)-backend $(COMMAND_DIR)/backend/main.go
+
+build-gateway-binary:
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo \
 	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
-	-o $(BUILD_DIR)/gateway $(COMMAND_DIR)/gateway/main.go
+	-o $(BUILD_DIR)/$(PROJECT_NAME)-gateway $(COMMAND_DIR)/gateway/main.go
 
-build-container-api:
+build-backend-container:
 	cd $(BUILD_DIR) && \
-	docker build . --no-cache --build-arg name=$(PROJECT_NAME)-api -t $(PROJECT_NAME)-api:latest -t $(PROJECT_NAME)-api:$(VERSION)
+	docker build . --no-cache --build-arg name=$(PROJECT_NAME)-backend -t $(PROJECT_NAME)-backend:latest -t $(PROJECT_NAME)-backend:$(VERSION)
 
-build-container-gateway:
+build-gateway-container:
 	cd $(BUILD_DIR) && \
 	docker build . --no-cache --build-arg name=$(PROJECT_NAME)-gateway -t $(PROJECT_NAME)-gateway:latest -t $(PROJECT_NAME)-gateway:$(VERSION)
 
@@ -92,7 +99,8 @@ protoc:
 	--validate_out "lang=go,paths=source_relative:pb" \
 	internal/protobuf/kvstore.proto
 
-genmocks:
+generate-mocks:
 	mockgen -source internal/usecases/interactor/interactor.go -destination mocks/usecases/interactor/interactor.go -package interactor
 	mockgen -source internal/adapters/repository/repository.go -destination mocks/adapters/repository/repository.go -package repository
 	mockgen -source internal/drivers/syncmap/syncmap.go        -destination mocks/drivers/syncmap/syncmap.go        -package syncmap
+

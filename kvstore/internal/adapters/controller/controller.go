@@ -25,12 +25,10 @@ func NewKVStoreServiceServer(config *config.Config, interactor interactor.Intera
 }
 
 func (i *kvstoreServiceServerImpl) CreatePack(ctx context.Context, req *pb.CreatePackRequest) (*pb.CreatePackResponse, error) {
-	err := req.Validate()
-	if err != nil {
+	if err := req.Validate(); err != nil {
 		return nil, err
 	}
-	err = req.GetPack().Validate()
-	if err != nil {
+	if err := req.GetPack().Validate(); err != nil {
 		return nil, err
 	}
 	pack, err := i.interactor.Create(ctx, i.boundary.PackResourceToDomain(req.GetPack()))
@@ -41,12 +39,10 @@ func (i *kvstoreServiceServerImpl) CreatePack(ctx context.Context, req *pb.Creat
 }
 
 func (i *kvstoreServiceServerImpl) GetPack(ctx context.Context, req *pb.GetPackRequest) (*pb.GetPackResponse, error) {
-	err := req.Validate()
-	if err != nil {
+	if err := req.Validate(); err != nil {
 		return nil, err
 	}
-	err = req.GetSeal().Validate()
-	if err != nil {
+	if err := req.GetSeal().Validate(); err != nil {
 		return nil, err
 	}
 	pack, err := i.interactor.Read(ctx, i.boundary.SealResourceToDomain(req.GetSeal()))
@@ -57,12 +53,10 @@ func (i *kvstoreServiceServerImpl) GetPack(ctx context.Context, req *pb.GetPackR
 }
 
 func (i *kvstoreServiceServerImpl) UpdatePack(ctx context.Context, req *pb.UpdatePackRequest) (*pb.UpdatePackResponse, error) {
-	err := req.Validate()
-	if err != nil {
+	if err := req.Validate(); err != nil {
 		return nil, err
 	}
-	err = req.GetPack().Validate()
-	if err != nil {
+	if err := req.GetPack().Validate(); err != nil {
 		return nil, err
 	}
 	pack, err := i.interactor.Update(ctx, i.boundary.PackResourceToDomain(req.GetPack()))
@@ -73,15 +67,13 @@ func (i *kvstoreServiceServerImpl) UpdatePack(ctx context.Context, req *pb.Updat
 }
 
 func (i *kvstoreServiceServerImpl) DeletePack(ctx context.Context, req *pb.DeletePackRequest) (*emptypb.Empty, error) {
-	err := req.Validate()
-	if err != nil {
+	if err := req.Validate(); err != nil {
 		return nil, err
 	}
-	err = req.GetSeal().Validate()
-	if err != nil {
+	if err := req.GetSeal().Validate(); err != nil {
 		return nil, err
 	}
-	err = i.interactor.Delete(ctx, i.boundary.SealResourceToDomain(req.GetSeal()))
+	err := i.interactor.Delete(ctx, i.boundary.SealResourceToDomain(req.GetSeal()))
 	if err != nil {
 		return nil, err
 	}

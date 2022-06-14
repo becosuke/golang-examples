@@ -9,6 +9,7 @@ import (
 	"github.com/becosuke/golang-examples/kvstore/pb"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"testing"
 )
@@ -22,24 +23,28 @@ func TestNewKVStoreServiceServer(t *testing.T) {
 	assert.Implements(t, (*pb.KVStoreServiceServer)(nil), serviceServer)
 }
 
-func TestKvstoreServiceServerImpl_CreatePack(t *testing.T) {
+func TestKVStoreServiceServerImpl_CreatePack(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockInteractor := interactor.NewMockInteractor(ctrl)
 	serviceServer := NewKVStoreServiceServer(config.NewConfig(), mockInteractor, boundary.NewBoundary())
 
-	pack := &pb.Pack{Key: "test-key", Value: "test-value"}
-	mockInteractor.EXPECT().Create(gomock.Any(), gomock.Any()).Return(&entity.Pack{Key: "test-key", Value: "test-value"}, nil)
 	ctx := context.Background()
-	req := &pb.CreatePackRequest{Pack: pack}
-	res, err := serviceServer.CreatePack(ctx, req)
 
+	var err error
+	_, err = serviceServer.CreatePack(ctx, &pb.CreatePackRequest{})
+	assert.Error(t, err)
+	_, err = serviceServer.CreatePack(ctx, &pb.CreatePackRequest{Pack: &pb.Pack{}})
+	assert.Error(t, err)
+
+	mockInteractor.EXPECT().Create(gomock.Any(), gomock.Any()).Return(&entity.Pack{Key: "test-key", Value: "test-value"}, nil)
+	res, err := serviceServer.CreatePack(ctx, &pb.CreatePackRequest{Pack: &pb.Pack{Key: "test-key", Value: "test-value"}})
+	require.NoError(t, err)
 	assert.Equal(t, "test-key", res.Pack.Key)
 	assert.Equal(t, "test-value", res.Pack.Value)
-	assert.NoError(t, err)
 }
 
-func TestKvstoreServiceServerImpl_GetPack(t *testing.T) {
+func TestKVStoreServiceServerImpl_GetPack(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	mockInteractor := interactor.NewMockInteractor(ctrl)
