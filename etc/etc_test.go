@@ -1,6 +1,7 @@
 package etc
 
 import (
+	"flag"
 	"net/url"
 	"testing"
 )
@@ -15,4 +16,10 @@ func TestSW(t *testing.T) {
 func TestURL(t *testing.T) {
 	u := &url.URL{}
 	t.Logf("url:%s", u.String())
+}
+
+func TestFlag(t *testing.T) {
+	flagString := flag.String("grpc-server-endpoint", "localhost:9090", "gRPC server endpoint")
+	flag.Parse()
+	t.Logf("%+v", *flagString)
 }
