@@ -9,56 +9,54 @@ import "google/protobuf/empty.proto";
 import "validate/validate.proto";
 
 service KVStoreService {
-  rpc CreatePack (CreatePackRequest) returns (CreatePackResponse) {
+  rpc GetPack (GetPackRequest) returns (GetPackResponse) {
+    option (google.api.http) = {
+      get: "/v1/pack/{key.body}"
+    };
+  }
+  rpc CreatePack (CreatePackRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/pack"
       body: "*"
     };
   }
-  rpc GetPack (GetPackRequest) returns (GetPackResponse) {
+  rpc UpdatePack (UpdatePackRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      get: "/v1/pack/{seal.key}"
-    };
-  }
-  rpc UpdatePack (UpdatePackRequest) returns (UpdatePackResponse) {
-    option (google.api.http) = {
-      put: "/v1/pack/{pack.key}"
+      put: "/v1/pack"
       body: "*"
     };
   }
   rpc DeletePack (DeletePackRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      delete: "/v1/pack/{seal.key}"
+      delete: "/v1/pack/{key.body}"
     };
   }
 }
 
-message CreatePackRequest {
-  Pack pack = 1 [(validate.rules).message.required = true];
-}
-message CreatePackResponse {
-  Pack pack = 1;
-}
 message GetPackRequest {
-  Seal seal = 1 [(validate.rules).message.required = true];
+  Key key = 1 [(validate.rules).message.required = true];
 }
 message GetPackResponse {
   Pack pack = 1;
 }
-message UpdatePackRequest {
-  Pack pack = 1 [(validate.rules).message.required = true];
+message CreatePackRequest {
+  Value value = 1 [(validate.rules).message.required = true];
 }
-message UpdatePackResponse {
-  Pack pack = 1;
+message UpdatePackRequest {
+  Key key = 1 [(validate.rules).message.required = true];
+  Value value = 2 [(validate.rules).message.required = true];
 }
 message DeletePackRequest {
-  Seal seal = 1 [(validate.rules).message.required = true];
+  Key key = 1 [(validate.rules).message.required = true];
 }
 
 message Pack {
-  string key = 1 [(validate.rules).string = {min_len:1, max_len:128}];
-  string value = 2 [(validate.rules).string = {min_len:1, max_len:128}];
+  Key key = 1 [(validate.rules).message.required = true];
+  Value value = 2 [(validate.rules).message.required = true];
 }
-message Seal {
-  string key = 1 [(validate.rules).string = {min_len:1, max_len:128}];
+message Key {
+  string body = 1 [(validate.rules).string.uuid = true];
+}
+message Value {
+  string body = 1 [(validate.rules).string = {min_len:1, max_len:128}];
 }
