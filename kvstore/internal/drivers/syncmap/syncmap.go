@@ -1,15 +1,14 @@
 package syncmap
 
 import (
-	"github.com/becosuke/golang-examples/kvstore/internal/registry/errors"
 	"sync"
 )
 
 type Syncmap interface {
-	LoadOrStore(*Message) (*Message, bool, error)
-	Load(Key) (*Message, error)
-	Store(*Message) (*Message, error)
-	Delete(Key) error
+	LoadOrStore(message *Message) (*Message, bool, error)
+	Load(key string) (*Message, error)
+	Store(message *Message) (*Message, error)
+	Delete(key string) error
 }
 
 func NewSyncmap() Syncmap {
@@ -22,48 +21,48 @@ type syncmapImpl struct {
 	syncmap *sync.Map
 }
 
-func (si *syncmapImpl) LoadOrStore(message *Message) (*Message, bool, error) {
+func (impl *syncmapImpl) LoadOrStore(message *Message) (*Message, bool, error) {
 	if message == nil {
-		return nil, false, errors.ErrSyncmapInvalidArgument
+		return nil, false, ErrSyncmapInvalidArgument
 	}
-	actual, loaded := si.syncmap.LoadOrStore(message.GetKey(), message.GetValue())
+	actual, loaded := impl.syncmap.LoadOrStore(message.Key(), message.Value())
 	if loaded {
-		asserted, ok := actual.(Value)
+		asserted, ok := actual.(string)
 		if !ok {
-			return nil, loaded, errors.ErrSyncmapInvalidData
+			return nil, loaded, ErrSyncmapInvalidData
 		}
-		return &Message{Key: message.GetKey(), Value: asserted}, loaded, nil
+		return NewMessage(message.Key(), asserted), loaded, nil
 	}
-	return &Message{Key: message.GetKey(), Value: message.GetValue()}, loaded, nil
+	return NewMessage(message.Key(), message.Value()), loaded, nil
 }
 
-func (si *syncmapImpl) Load(key Key) (*Message, error) {
+func (impl *syncmapImpl) Load(key string) (*Message, error) {
 	if key == "" {
-		return nil, errors.ErrSyncmapInvalidArgument
+		return nil, ErrSyncmapInvalidArgument
 	}
-	value, ok := si.syncmap.Load(key)
+	actual, ok := impl.syncmap.Load(key)
 	if !ok {
-		return nil, errors.ErrSyncmapNotFound
+		return nil, ErrSyncmapNotFound
 	}
-	asserted, ok := value.(Value)
+	asserted, ok := actual.(string)
 	if !ok {
-		return nil, errors.ErrSyncmapInvalidData
+		return nil, ErrSyncmapInvalidData
 	}
-	return &Message{Key: key, Value: asserted}, nil
+	return NewMessage(key, asserted), nil
 }
 
-func (si *syncmapImpl) Store(message *Message) (*Message, error) {
+func (impl *syncmapImpl) Store(message *Message) (*Message, error) {
 	if message == nil {
-		return nil, errors.ErrSyncmapInvalidArgument
+		return nil, ErrSyncmapInvalidArgument
 	}
-	si.syncmap.Store(message.GetKey(), message.GetValue())
-	return &Message{Key: message.GetKey(), Value: message.GetValue()}, nil
+	impl.syncmap.Store(message.Key(), message.Value())
+	return NewMessage(message.Key(), message.Value()), nil
 }
 
-func (si *syncmapImpl) Delete(key Key) error {
+func (impl *syncmapImpl) Delete(key string) error {
 	if key == "" {
-		return errors.ErrSyncmapInvalidArgument
+		return ErrSyncmapInvalidArgument
 	}
-	si.syncmap.Delete(key)
+	impl.syncmap.Delete(key)
 	return nil
 }

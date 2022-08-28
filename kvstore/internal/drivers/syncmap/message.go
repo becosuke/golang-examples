@@ -1,32 +1,21 @@
 package syncmap
 
-type Key string
-type Value string
-
 type Message struct {
-	Key
-	Value
+	key   string
+	value string
 }
 
-func NewMessage(key Key, value Value) *Message {
+func NewMessage(key string, value string) *Message {
 	return &Message{
-		Key:   key,
-		Value: value,
+		key:   key,
+		value: value,
 	}
 }
 
-func (m Message) GetKey() Key {
-	return m.Key
+func (m Message) Key() string {
+	return m.key
 }
 
-func (m Message) GetValue() Value {
-	return m.Value
-}
-
-func (k Key) String() string {
-	return string(k)
-}
-
-func (v Value) String() string {
-	return string(v)
+func (m Message) Value() string {
+	return m.value
 }
