@@ -4,6 +4,7 @@ import (
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/boundary"
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/controller"
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/repository"
+	"github.com/becosuke/golang-examples/kvstore/internal/domain/pack"
 	"github.com/becosuke/golang-examples/kvstore/internal/drivers/grpcserver"
 	"github.com/becosuke/golang-examples/kvstore/internal/drivers/logger"
 	"github.com/becosuke/golang-examples/kvstore/internal/drivers/syncmap"
@@ -20,9 +21,9 @@ type Injection interface {
 	InjectLogger() logger.Logger
 	InjectGrpcServer() *grpc.Server
 	InjectController() pb.KVStoreServiceServer
-	InjectUsecase() interactor.Interactor
+	InjectUsecase() pack.Usecase
 	InjectBoundary() boundary.Boundary
-	InjectRepository() repository.Repository
+	InjectRepository() pack.Repository
 	InjectSyncmap() syncmap.Syncmap
 }
 
@@ -36,9 +37,9 @@ type injectionImpl struct {
 		Logger               logger.Logger
 		GrpcServer           *grpc.Server
 		KVStoreServiceServer pb.KVStoreServiceServer
-		Usecase              interactor.Interactor
+		Usecase              pack.Usecase
 		Boundary             boundary.Boundary
-		Repository           repository.Repository
+		Repository           pack.Repository
 		Syncmap              syncmap.Syncmap
 	}
 	serviceName string
@@ -103,12 +104,12 @@ func (i *injectionImpl) InjectController() pb.KVStoreServiceServer {
 	return i.container.KVStoreServiceServer
 }
 
-func (i *injectionImpl) InjectUsecase() interactor.Interactor {
-	actual, _ := i.store.LoadOrStore("interactor", &sync.Once{})
+func (i *injectionImpl) InjectUsecase() pack.Usecase {
+	actual, _ := i.store.LoadOrStore("usecase", &sync.Once{})
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			i.container.Usecase = interactor.NewInteractor(i.InjectConfig(), i.InjectRepository())
+			i.container.Usecase = interactor.NewUsecase(i.InjectConfig(), i.InjectRepository())
 		})
 	}
 	return i.container.Usecase
@@ -125,7 +126,7 @@ func (i *injectionImpl) InjectBoundary() boundary.Boundary {
 	return i.container.Boundary
 }
 
-func (i *injectionImpl) InjectRepository() repository.Repository {
+func (i *injectionImpl) InjectRepository() pack.Repository {
 	actual, _ := i.store.LoadOrStore("repository", &sync.Once{})
 	once, ok := actual.(*sync.Once)
 	if ok {
