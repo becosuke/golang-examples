@@ -7,13 +7,13 @@ import (
 )
 
 func TestNewKey(t *testing.T) {
-	newUUID := uuid.New()
+	newUUID := uuid.MustParse("b3b8500d-3502-4420-a600-49081c68d24b")
 	newKey := NewKey(newUUID)
 	assert.Equal(t, Key(newUUID), *newKey)
 }
 
 func TestKey_UUID(t *testing.T) {
-	newUUID := uuid.New()
+	newUUID := uuid.MustParse("b3b8500d-3502-4420-a600-49081c68d24b")
 	newKey := NewKey(newUUID)
 	assert.Equal(t, newUUID, newKey.UUID())
 
