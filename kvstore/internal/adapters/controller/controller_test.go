@@ -3,11 +3,12 @@ package controller
 import (
 	"context"
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/boundary"
-	"github.com/becosuke/golang-examples/kvstore/internal/domain/entity"
+	"github.com/becosuke/golang-examples/kvstore/internal/domain/pack"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
-	"github.com/becosuke/golang-examples/kvstore/mocks/usecases/interactor"
+	mock "github.com/becosuke/golang-examples/kvstore/mocks/domain/pack"
 	"github.com/becosuke/golang-examples/kvstore/pb"
 	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -17,79 +18,88 @@ import (
 func TestNewKVStoreServiceServer(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockInteractor := interactor.NewMockInteractor(ctrl)
-	serviceServer := NewKVStoreServiceServer(config.NewConfig(), mockInteractor, boundary.NewBoundary())
+	newMockUsecase := mock.NewMockUsecase(ctrl)
+	newKVStoreServiceServer := NewKVStoreServiceServer(config.NewConfig(), newMockUsecase, boundary.NewBoundary())
 
-	assert.Implements(t, (*pb.KVStoreServiceServer)(nil), serviceServer)
-}
-
-func TestKVStoreServiceServerImpl_CreatePack(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	mockInteractor := interactor.NewMockInteractor(ctrl)
-	serviceServer := NewKVStoreServiceServer(config.NewConfig(), mockInteractor, boundary.NewBoundary())
-
-	ctx := context.Background()
-
-	var err error
-	_, err = serviceServer.CreatePack(ctx, &pb.CreatePackRequest{})
-	assert.Error(t, err)
-	_, err = serviceServer.CreatePack(ctx, &pb.CreatePackRequest{Pack: &pb.Pack{}})
-	assert.Error(t, err)
-
-	mockInteractor.EXPECT().Create(gomock.Any(), gomock.Any()).Return(&entity.Pack{Key: "test-key", Value: "test-value"}, nil)
-	res, err := serviceServer.CreatePack(ctx, &pb.CreatePackRequest{Pack: &pb.Pack{Key: "test-key", Value: "test-value"}})
-	require.NoError(t, err)
-	assert.Equal(t, "test-key", res.Pack.Key)
-	assert.Equal(t, "test-value", res.Pack.Value)
+	assert.Implements(t, (*pb.KVStoreServiceServer)(nil), newKVStoreServiceServer)
 }
 
 func TestKVStoreServiceServerImpl_GetPack(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockInteractor := interactor.NewMockInteractor(ctrl)
-	serviceServer := NewKVStoreServiceServer(config.NewConfig(), mockInteractor, boundary.NewBoundary())
+	newMockUsecase := mock.NewMockUsecase(ctrl)
+	newKVStoreServiceServer := NewKVStoreServiceServer(config.NewConfig(), newMockUsecase, boundary.NewBoundary())
 
-	seal := &pb.Seal{Key: "test-key"}
-	mockInteractor.EXPECT().Read(gomock.Any(), gomock.Any()).Return(&entity.Pack{Key: "test-key", Value: "test-value"}, nil)
 	ctx := context.Background()
-	req := &pb.GetPackRequest{Seal: seal}
-	res, err := serviceServer.GetPack(ctx, req)
-
-	assert.Equal(t, "test-key", res.Pack.Key)
-	assert.Equal(t, "test-value", res.Pack.Value)
+	keyString := "b3b8500d-3502-4420-a600-49081c68d24b"
+	valueString := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
+	newKey := pack.NewKey(uuid.MustParse(keyString))
+	newValue := pack.NewValue(valueString)
+	newPack := pack.NewPack(newKey, newValue)
+	newMockUsecase.EXPECT().Read(ctx, newKey).Return(newPack, nil)
+	req := &pb.GetPackRequest{Key: &pb.Key{Body: keyString}}
+	res, err := newKVStoreServiceServer.GetPack(ctx, req)
 	assert.NoError(t, err)
+	assert.Equal(t, keyString, res.GetPack().GetKey().GetBody())
+	assert.Equal(t, valueString, res.GetPack().GetValue().GetBody())
+}
+
+func TestKVStoreServiceServerImpl_CreatePack(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	newMockUsecase := mock.NewMockUsecase(ctrl)
+	newKVStoreServiceServer := NewKVStoreServiceServer(config.NewConfig(), newMockUsecase, boundary.NewBoundary())
+
+	ctx := context.Background()
+
+	var err error
+	_, err = newKVStoreServiceServer.CreatePack(ctx, &pb.CreatePackRequest{})
+	assert.Error(t, err)
+	_, err = newKVStoreServiceServer.CreatePack(ctx, &pb.CreatePackRequest{Value: &pb.Value{}})
+	assert.Error(t, err)
+
+	keyString :=   "00000000-0000-0000-0000-000000000000"
+	valueString := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
+	newKey := pack.NewKey(uuid.MustParse(keyString))
+	newValue := pack.NewValue(valueString)
+	newPack := pack.NewPack(newKey, newValue)
+	newMockUsecase.EXPECT().Create(ctx, newPack).Return(nil)
+	res, err := newKVStoreServiceServer.CreatePack(ctx, &pb.CreatePackRequest{Value: &pb.Value{Body: valueString}})
+	require.NoError(t, err)
+	assert.Equal(t, &emptypb.Empty{}, res)
 }
 
 func TestKvstoreServiceServerImpl_UpdatePack(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockInteractor := interactor.NewMockInteractor(ctrl)
-	serviceServer := NewKVStoreServiceServer(config.NewConfig(), mockInteractor, boundary.NewBoundary())
+	newMockUsecase := mock.NewMockUsecase(ctrl)
+	newKVStoreServiceServer := NewKVStoreServiceServer(config.NewConfig(), newMockUsecase, boundary.NewBoundary())
 
-	pack := &pb.Pack{Key: "test-key", Value: "test-value"}
-	mockInteractor.EXPECT().Update(gomock.Any(), gomock.Any()).Return(&entity.Pack{Key: "test-key", Value: "test-value"}, nil)
 	ctx := context.Background()
-	req := &pb.UpdatePackRequest{Pack: pack}
-	res, err := serviceServer.UpdatePack(ctx, req)
-
-	assert.Equal(t, "test-key", res.Pack.Key)
-	assert.Equal(t, "test-value", res.Pack.Value)
+	keyString := "b3b8500d-3502-4420-a600-49081c68d24b"
+	valueString := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
+	newKey := pack.NewKey(uuid.MustParse(keyString))
+	newValue := pack.NewValue(valueString)
+	newPack := pack.NewPack(newKey, newValue)
+	newMockUsecase.EXPECT().Update(ctx, newPack).Return(nil)
+	req := &pb.UpdatePackRequest{Key: &pb.Key{Body: keyString}, Value: &pb.Value{Body: valueString}}
+	res, err := newKVStoreServiceServer.UpdatePack(ctx, req)
 	assert.NoError(t, err)
+	assert.Equal(t, &emptypb.Empty{}, res)
 }
 
 func TestKvstoreServiceServerImpl_DeletePack(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockInteractor := interactor.NewMockInteractor(ctrl)
-	serviceServer := NewKVStoreServiceServer(config.NewConfig(), mockInteractor, boundary.NewBoundary())
+	newMockUsecase := mock.NewMockUsecase(ctrl)
+	newKVStoreServiceServer := NewKVStoreServiceServer(config.NewConfig(), newMockUsecase, boundary.NewBoundary())
 
-	seal := &pb.Seal{Key: "test-key"}
-	mockInteractor.EXPECT().Delete(gomock.Any(), gomock.Any()).Return(nil)
 	ctx := context.Background()
-	req := &pb.DeletePackRequest{Seal: seal}
-	res, err := serviceServer.DeletePack(ctx, req)
-
-	assert.Equal(t, &emptypb.Empty{}, res)
+	keyString := "b3b8500d-3502-4420-a600-49081c68d24b"
+	newKey := pack.NewKey(uuid.MustParse(keyString))
+	newMockUsecase.EXPECT().Delete(ctx, newKey).Return(nil)
+	req := &pb.DeletePackRequest{Key: &pb.Key{Body: keyString}}
+	res, err := newKVStoreServiceServer.DeletePack(ctx, req)
 	assert.NoError(t, err)
+	assert.Equal(t, &emptypb.Empty{}, res)
 }
