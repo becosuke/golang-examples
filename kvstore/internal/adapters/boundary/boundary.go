@@ -12,7 +12,7 @@ type Boundary interface {
 	ValueDomainToResource(domainValue *pack.Value) *pb.Value
 	ValueResourceToDomain(resourceValue *pb.Value) *pack.Value
 	PackDomainToResource(domainPack *pack.Pack) *pb.Pack
-	PackResourceToDomain(resourcePack *pb.Pack) *pack.Pack
+	PackResourceToDomain(resourceKey *pb.Key, resourceValue *pb.Value) *pack.Pack
 }
 
 func NewBoundary() Boundary {
@@ -51,9 +51,9 @@ func (impl *boundaryImpl) PackDomainToResource(domainPack *pack.Pack) *pb.Pack {
 	}
 }
 
-func (impl *boundaryImpl) PackResourceToDomain(resourcePack *pb.Pack) *pack.Pack {
+func (impl *boundaryImpl) PackResourceToDomain(resourceKey *pb.Key, resourceValue *pb.Value) *pack.Pack {
 	return pack.NewPack(
-		impl.KeyResourceToDomain(resourcePack.GetKey()),
-		impl.ValueResourceToDomain(resourcePack.GetValue()),
+		impl.KeyResourceToDomain(resourceKey),
+		impl.ValueResourceToDomain(resourceValue),
 	)
 }

@@ -58,7 +58,8 @@ func TestBoundaryImpl_PackResourceToDomain(t *testing.T) {
 	newBoundary := NewBoundary()
 	keyString := "b3b8500d-3502-4420-a600-49081c68d24b"
 	valueString := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
-	resourcePack := &pb.Pack{Key: &pb.Key{Body: keyString}, Value: &pb.Value{Body: valueString}}
-	toDomain := newBoundary.PackResourceToDomain(resourcePack)
+	resourceKey := &pb.Key{Body: keyString}
+	resourceValue := &pb.Value{Body: valueString}
+	toDomain := newBoundary.PackResourceToDomain(resourceKey, resourceValue)
 	assert.Equal(t, pack.NewPack(pack.NewKey(uuid.MustParse(keyString)), pack.NewValue(valueString)), toDomain)
 }
