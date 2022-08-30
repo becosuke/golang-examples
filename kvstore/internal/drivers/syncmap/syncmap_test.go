@@ -14,82 +14,89 @@ func TestNewSyncmap(t *testing.T) {
 }
 
 func TestSyncmapImpl_LoadOrStore(t *testing.T) {
-	syncmap := NewSyncmap()
+	newSyncmap := NewSyncmap()
 
-	actual, loaded, err := syncmap.LoadOrStore(nil)
+	actual, loaded, err := newSyncmap.LoadOrStore(nil)
 	assert.Nil(t, actual)
 	assert.False(t, loaded)
 	assert.EqualError(t, err, ErrSyncmapInvalidArgument.String())
 
-	message1 := NewMessage("kkk", "vvv")
-	actual, loaded, err = syncmap.LoadOrStore(message1)
-	assert.Equal(t, message1.Key(), actual.Key())
-	assert.Equal(t, message1.Value(), actual.Value())
+	keyString1 := "b3b8500d-3502-4420-a600-49081c68d24b"
+	valueString1 := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
+	message1 := NewMessage(keyString1, valueString1)
+	actual, loaded, err = newSyncmap.LoadOrStore(message1)
+	assert.Equal(t, keyString1, actual.Key())
+	assert.Equal(t, valueString1, actual.Value())
 	assert.False(t, loaded)
 	assert.NoError(t, err)
 
-	message2 := NewMessage("kkk", "bbb")
-	actual, loaded, err = syncmap.LoadOrStore(message2)
-	assert.Equal(t, message2.Key(), actual.Key())
-	assert.Equal(t, message1.Value(), actual.Value()) // no change
+	valueString2 :=  "d1ee96c5-e6de-42ff-a168-1272586c2c70"
+	message2 := NewMessage(keyString1, valueString2)
+	actual, loaded, err = newSyncmap.LoadOrStore(message2)
+	assert.Equal(t, keyString1, actual.Key())
+	assert.Equal(t, valueString1, actual.Value()) // no change
 	assert.True(t, loaded)
 	assert.NoError(t, err)
 
-	syncMap := &sync.Map{}
-	syncMap.Store("kkk", 111)
-	syncmap = &syncmapImpl{syncmap: syncMap}
-	actual, loaded, err = syncmap.LoadOrStore(NewMessage("kkk", "vvv"))
+	syncmap := &sync.Map{}
+	syncmap.Store(keyString1, 111)
+	newSyncmap = &syncmapImpl{syncmap: syncmap}
+	actual, loaded, err = newSyncmap.LoadOrStore(NewMessage(keyString1, valueString1))
 	assert.Nil(t, actual)
 	assert.True(t, loaded)
 	assert.EqualError(t, err, ErrSyncmapInvalidData.String())
 }
 
 func TestSyncmapImpl_Load(t *testing.T) {
-	syncmap := NewSyncmap()
+	newSyncmap := NewSyncmap()
 
-	actual, err := syncmap.Load("")
+	actual, err := newSyncmap.Load("")
 	assert.Nil(t, actual)
 	assert.EqualError(t, err, ErrSyncmapInvalidArgument.String())
 
-	messageKey := "kkk"
-	actual, err = syncmap.Load(messageKey)
+	keyString := "b3b8500d-3502-4420-a600-49081c68d24b"
+	actual, err = newSyncmap.Load(keyString)
 	assert.Nil(t, actual)
 	assert.EqualError(t, err, ErrSyncmapNotFound.String())
 
-	message := NewMessage("kkk", "vvv")
-	_, err = syncmap.Store(message)
+	valueString := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
+	message := NewMessage(keyString, valueString)
+	_, err = newSyncmap.Store(message)
 	require.NoError(t, err)
 
-	actual, err = syncmap.Load(messageKey)
-	assert.Equal(t, message.Key(), actual.Key())
-	assert.Equal(t, message.Value(), actual.Value())
+	actual, err = newSyncmap.Load(keyString)
+	assert.Equal(t, keyString, actual.Key())
+	assert.Equal(t, valueString, actual.Value())
 	assert.NoError(t, err)
 
-	syncMap := &sync.Map{}
-	syncMap.Store("kkk", 111)
-	syncmap = &syncmapImpl{syncmap: syncMap}
-	actual, err = syncmap.Load("kkk")
+	syncmap := &sync.Map{}
+	syncmap.Store(keyString, 111)
+	newSyncmap = &syncmapImpl{syncmap: syncmap}
+	actual, err = newSyncmap.Load(keyString)
 	assert.Nil(t, actual)
 	assert.EqualError(t, err, ErrSyncmapInvalidData.String())
 }
 
 func TestSyncmapImpl_Store(t *testing.T) {
-	syncmap := NewSyncmap()
+	newSyncmap := NewSyncmap()
 
-	actual, err := syncmap.Store(nil)
+	actual, err := newSyncmap.Store(nil)
 	assert.Nil(t, actual)
 	assert.EqualError(t, err, ErrSyncmapInvalidArgument.String())
 
-	message1 := NewMessage("kkk", "vvv")
-	actual, err = syncmap.Store(message1)
-	assert.Equal(t, message1.Key(), actual.Key())
-	assert.Equal(t, message1.Value(), actual.Value())
+	keyString1 := "b3b8500d-3502-4420-a600-49081c68d24b"
+	valueString1 := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
+	message1 := NewMessage(keyString1, valueString1)
+	actual, err = newSyncmap.Store(message1)
+	assert.Equal(t, keyString1, actual.Key())
+	assert.Equal(t, valueString1, actual.Value())
 	assert.NoError(t, err)
 
-	message2 := NewMessage("kkk", "bbb")
-	actual, err = syncmap.Store(message2)
-	assert.Equal(t, message2.Key(), actual.Key())
-	assert.Equal(t, message2.Value(), actual.Value())
+	valueString2 :=  "d1ee96c5-e6de-42ff-a168-1272586c2c70"
+	message2 := NewMessage(keyString1, valueString2)
+	actual, err = newSyncmap.Store(message2)
+	assert.Equal(t, keyString1, actual.Key())
+	assert.Equal(t, valueString2, actual.Value())
 	assert.NoError(t, err)
 }
 
@@ -99,15 +106,15 @@ func TestSyncmapImpl_Delete(t *testing.T) {
 	err := syncmap.Delete("")
 	assert.EqualError(t, err, ErrSyncmapInvalidArgument.String())
 
-	message := NewMessage("kkk", "vvv")
+	keyString := "b3b8500d-3502-4420-a600-49081c68d24b"
+	valueString := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
+	message := NewMessage(keyString, valueString)
 	_, err = syncmap.Store(message)
 	require.NoError(t, err)
 
-	messageKey := "kkk"
-	err = syncmap.Delete(messageKey)
+	err = syncmap.Delete(keyString)
 	assert.NoError(t, err)
 
-	messageKey = "kkk"
-	err = syncmap.Delete(messageKey)
+	err = syncmap.Delete(keyString)
 	assert.NoError(t, err)
 }
