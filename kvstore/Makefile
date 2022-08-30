@@ -97,10 +97,10 @@ protoc:
 	--go-grpc_out pb --go-grpc_opt paths=source_relative \
 	--grpc-gateway_out pb --grpc-gateway_opt paths=source_relative \
 	--validate_out "lang=go,paths=source_relative:pb" \
-	internal/protobuf/kvstore.proto
+	proto/kvstore.proto
 
 generate-mocks:
-	mockgen -source internal/usecases/interactor/interactor.go -destination mocks/usecases/interactor/interactor.go -package interactor
-	mockgen -source internal/adapters/repository/repository.go -destination mocks/adapters/repository/repository.go -package repository
-	mockgen -source internal/drivers/syncmap/syncmap.go        -destination mocks/drivers/syncmap/syncmap.go        -package syncmap
+	mockgen -source internal/domain/pack/usecase.go      -destination mocks/domain/pack/usecase.go      -package pack
+	mockgen -source internal/domain/pack/repository.go   -destination mocks/domain/pack/repository.go   -package pack
+	mockgen -source internal/drivers/syncmap/syncmap.go  -destination mocks/drivers/syncmap/syncmap.go  -package syncmap
 
