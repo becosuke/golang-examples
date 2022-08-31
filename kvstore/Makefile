@@ -100,7 +100,7 @@ protoc:
 	proto/kvstore.proto
 
 generate-mocks:
-	mockgen -source internal/domain/pack/usecase.go      -destination mocks/domain/pack/usecase.go      -package pack
-	mockgen -source internal/domain/pack/repository.go   -destination mocks/domain/pack/repository.go   -package pack
-	mockgen -source internal/drivers/syncmap/syncmap.go  -destination mocks/drivers/syncmap/syncmap.go  -package syncmap
-
+	mockgen -source internal/domain/pack/usecase.go -destination mocks/domain/pack/usecase.go -package pack
+	mockgen -source internal/domain/pack/repository.go -destination mocks/domain/pack/repository.go -package pack
+	mockgen -source internal/domain/pack/generator.go -destination mocks/domain/pack/generator.go -package pack
+	mockgen -source internal/drivers/syncmap/syncmap.go -destination mocks/drivers/syncmap/syncmap.go -package syncmap
