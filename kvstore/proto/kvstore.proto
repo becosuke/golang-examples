@@ -14,13 +14,13 @@ service KVStoreService {
       get: "/v1/pack/{key.body}"
     };
   }
-  rpc CreatePack (CreatePackRequest) returns (google.protobuf.Empty) {
+  rpc CreatePack (CreatePackRequest) returns (CreatePackResponse) {
     option (google.api.http) = {
       post: "/v1/pack"
       body: "*"
     };
   }
-  rpc UpdatePack (UpdatePackRequest) returns (google.protobuf.Empty) {
+  rpc UpdatePack (UpdatePackRequest) returns (UpdatePackResponse) {
     option (google.api.http) = {
       put: "/v1/pack"
       body: "*"
@@ -42,9 +42,15 @@ message GetPackResponse {
 message CreatePackRequest {
   Value value = 1 [(validate.rules).message.required = true];
 }
+message CreatePackResponse {
+  Pack pack = 1;
+}
 message UpdatePackRequest {
   Key key = 1 [(validate.rules).message.required = true];
   Value value = 2 [(validate.rules).message.required = true];
+}
+message UpdatePackResponse {
+  Pack pack = 1;
 }
 message DeletePackRequest {
   Key key = 1 [(validate.rules).message.required = true];
@@ -55,7 +61,7 @@ message Pack {
   Value value = 2 [(validate.rules).message.required = true];
 }
 message Key {
-  string body = 1 [(validate.rules).string.uuid = true];
+  string body = 1 [(validate.rules).string = {min_len:1, max_len:128}];
 }
 message Value {
   string body = 1 [(validate.rules).string = {min_len:1, max_len:128}];

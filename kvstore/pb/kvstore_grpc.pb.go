@@ -24,8 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KVStoreServiceClient interface {
 	GetPack(ctx context.Context, in *GetPackRequest, opts ...grpc.CallOption) (*GetPackResponse, error)
-	CreatePack(ctx context.Context, in *CreatePackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	UpdatePack(ctx context.Context, in *UpdatePackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CreatePack(ctx context.Context, in *CreatePackRequest, opts ...grpc.CallOption) (*CreatePackResponse, error)
+	UpdatePack(ctx context.Context, in *UpdatePackRequest, opts ...grpc.CallOption) (*UpdatePackResponse, error)
 	DeletePack(ctx context.Context, in *DeletePackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -46,8 +46,8 @@ func (c *kVStoreServiceClient) GetPack(ctx context.Context, in *GetPackRequest, 
 	return out, nil
 }
 
-func (c *kVStoreServiceClient) CreatePack(ctx context.Context, in *CreatePackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *kVStoreServiceClient) CreatePack(ctx context.Context, in *CreatePackRequest, opts ...grpc.CallOption) (*CreatePackResponse, error) {
+	out := new(CreatePackResponse)
 	err := c.cc.Invoke(ctx, "/pb.KVStoreService/CreatePack", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -55,8 +55,8 @@ func (c *kVStoreServiceClient) CreatePack(ctx context.Context, in *CreatePackReq
 	return out, nil
 }
 
-func (c *kVStoreServiceClient) UpdatePack(ctx context.Context, in *UpdatePackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *kVStoreServiceClient) UpdatePack(ctx context.Context, in *UpdatePackRequest, opts ...grpc.CallOption) (*UpdatePackResponse, error) {
+	out := new(UpdatePackResponse)
 	err := c.cc.Invoke(ctx, "/pb.KVStoreService/UpdatePack", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -78,8 +78,8 @@ func (c *kVStoreServiceClient) DeletePack(ctx context.Context, in *DeletePackReq
 // for forward compatibility
 type KVStoreServiceServer interface {
 	GetPack(context.Context, *GetPackRequest) (*GetPackResponse, error)
-	CreatePack(context.Context, *CreatePackRequest) (*emptypb.Empty, error)
-	UpdatePack(context.Context, *UpdatePackRequest) (*emptypb.Empty, error)
+	CreatePack(context.Context, *CreatePackRequest) (*CreatePackResponse, error)
+	UpdatePack(context.Context, *UpdatePackRequest) (*UpdatePackResponse, error)
 	DeletePack(context.Context, *DeletePackRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedKVStoreServiceServer()
 }
@@ -91,10 +91,10 @@ type UnimplementedKVStoreServiceServer struct {
 func (UnimplementedKVStoreServiceServer) GetPack(context.Context, *GetPackRequest) (*GetPackResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPack not implemented")
 }
-func (UnimplementedKVStoreServiceServer) CreatePack(context.Context, *CreatePackRequest) (*emptypb.Empty, error) {
+func (UnimplementedKVStoreServiceServer) CreatePack(context.Context, *CreatePackRequest) (*CreatePackResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePack not implemented")
 }
-func (UnimplementedKVStoreServiceServer) UpdatePack(context.Context, *UpdatePackRequest) (*emptypb.Empty, error) {
+func (UnimplementedKVStoreServiceServer) UpdatePack(context.Context, *UpdatePackRequest) (*UpdatePackResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePack not implemented")
 }
 func (UnimplementedKVStoreServiceServer) DeletePack(context.Context, *DeletePackRequest) (*emptypb.Empty, error) {

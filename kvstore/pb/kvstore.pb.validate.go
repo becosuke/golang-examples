@@ -35,9 +35,6 @@ var (
 	_ = sort.Sort
 )
 
-// define the regex for a UUID once up-front
-var _kvstore_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
-
 // Validate checks the field values on GetPackRequest with the rules defined in
 // the proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
@@ -449,6 +446,137 @@ var _ interface {
 	ErrorName() string
 } = CreatePackRequestValidationError{}
 
+// Validate checks the field values on CreatePackResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *CreatePackResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CreatePackResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// CreatePackResponseMultiError, or nil if none found.
+func (m *CreatePackResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreatePackResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPack()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, CreatePackResponseValidationError{
+					field:  "Pack",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, CreatePackResponseValidationError{
+					field:  "Pack",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPack()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CreatePackResponseValidationError{
+				field:  "Pack",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return CreatePackResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// CreatePackResponseMultiError is an error wrapping multiple validation errors
+// returned by CreatePackResponse.ValidateAll() if the designated constraints
+// aren't met.
+type CreatePackResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreatePackResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreatePackResponseMultiError) AllErrors() []error { return m }
+
+// CreatePackResponseValidationError is the validation error returned by
+// CreatePackResponse.Validate if the designated constraints aren't met.
+type CreatePackResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreatePackResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreatePackResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreatePackResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreatePackResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreatePackResponseValidationError) ErrorName() string {
+	return "CreatePackResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreatePackResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreatePackResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreatePackResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreatePackResponseValidationError{}
+
 // Validate checks the field values on UpdatePackRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -630,6 +758,137 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpdatePackRequestValidationError{}
+
+// Validate checks the field values on UpdatePackResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *UpdatePackResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdatePackResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// UpdatePackResponseMultiError, or nil if none found.
+func (m *UpdatePackResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdatePackResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetPack()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, UpdatePackResponseValidationError{
+					field:  "Pack",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, UpdatePackResponseValidationError{
+					field:  "Pack",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetPack()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdatePackResponseValidationError{
+				field:  "Pack",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return UpdatePackResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// UpdatePackResponseMultiError is an error wrapping multiple validation errors
+// returned by UpdatePackResponse.ValidateAll() if the designated constraints
+// aren't met.
+type UpdatePackResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdatePackResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdatePackResponseMultiError) AllErrors() []error { return m }
+
+// UpdatePackResponseValidationError is the validation error returned by
+// UpdatePackResponse.Validate if the designated constraints aren't met.
+type UpdatePackResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdatePackResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdatePackResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdatePackResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdatePackResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdatePackResponseValidationError) ErrorName() string {
+	return "UpdatePackResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdatePackResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdatePackResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdatePackResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdatePackResponseValidationError{}
 
 // Validate checks the field values on DeletePackRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
@@ -972,11 +1231,10 @@ func (m *Key) validate(all bool) error {
 
 	var errors []error
 
-	if err := m._validateUuid(m.GetBody()); err != nil {
-		err = KeyValidationError{
+	if l := utf8.RuneCountInString(m.GetBody()); l < 1 || l > 128 {
+		err := KeyValidationError{
 			field:  "Body",
-			reason: "value must be a valid UUID",
-			cause:  err,
+			reason: "value length must be between 1 and 128 runes, inclusive",
 		}
 		if !all {
 			return err
@@ -986,14 +1244,6 @@ func (m *Key) validate(all bool) error {
 
 	if len(errors) > 0 {
 		return KeyMultiError(errors)
-	}
-
-	return nil
-}
-
-func (m *Key) _validateUuid(uuid string) error {
-	if matched := _kvstore_uuidPattern.MatchString(uuid); !matched {
-		return errors.New("invalid uuid format")
 	}
 
 	return nil

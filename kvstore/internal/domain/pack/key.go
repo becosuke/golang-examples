@@ -1,23 +1,15 @@
 package pack
 
-import (
-	"github.com/google/uuid"
-)
+type Key string
 
-type Key uuid.UUID
-
-func NewKey(key uuid.UUID) *Key {
+func NewKey(key string) *Key {
 	k := Key(key)
 	return &k
 }
 
-func (k *Key) UUID() uuid.UUID {
-	if k == nil {
-		return uuid.Nil
-	}
-	return uuid.UUID(*k)
-}
-
 func (k *Key) String() string {
-	return k.UUID().String()
+	if k == nil {
+		return ""
+	}
+	return string(*k)
 }

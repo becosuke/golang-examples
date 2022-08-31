@@ -3,58 +3,60 @@ package repository
 import (
 	"context"
 	"errors"
-	"github.com/becosuke/golang-examples/kvstore/internal/domain/pack"
+	domain "github.com/becosuke/golang-examples/kvstore/internal/domain/pack"
 	"github.com/becosuke/golang-examples/kvstore/internal/drivers/syncmap"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
-	"github.com/google/uuid"
 )
 
-func NewRepository(config *config.Config, syncmap syncmap.Syncmap) pack.Repository {
+func NewRepository(config *config.Config, syncmap syncmap.Syncmap, generator domain.Generator) domain.Repository {
 	return &repositoryImpl{
-		config: config,
-		store:  syncmap,
+		config:    config,
+		store:     syncmap,
+		generator: generator,
 	}
 }
 
 type repositoryImpl struct {
-	config *config.Config
-	store  syncmap.Syncmap
+	config    *config.Config
+	store     syncmap.Syncmap
+	generator domain.Generator
 }
 
-func (impl *repositoryImpl) Read(_ context.Context, key *pack.Key) (*pack.Pack, error) {
+func (impl *repositoryImpl) Read(_ context.Context, key *domain.Key) (*domain.Pack, error) {
 	message, err := impl.store.Load(key.String())
 	return impl.ToEntity(message), err
 }
 
-func (impl *repositoryImpl) Create(_ context.Context, pack *pack.Pack) error {
-	_, loaded, err := impl.store.LoadOrStore(impl.ToSyncmapMessage(pack))
+func (impl *repositoryImpl) Create(_ context.Context, value *domain.Value) (*domain.Key, error) {
+	key := impl.generator.GenerateKey()
+	_, loaded, err := impl.store.LoadOrStore(impl.ToSyncmapMessage(domain.NewPack(key, value)))
 	if loaded {
-		return errors.New("already exists")
+		return nil, errors.New("already exists")
 	}
-	return err
+	return key, err
 }
 
-func (impl *repositoryImpl) Update(_ context.Context, pack *pack.Pack) error {
+func (impl *repositoryImpl) Update(_ context.Context, pack *domain.Pack) error {
 	_, err := impl.store.Store(impl.ToSyncmapMessage(pack))
 	return err
 }
 
-func (impl *repositoryImpl) Delete(_ context.Context, key *pack.Key) error {
+func (impl *repositoryImpl) Delete(_ context.Context, key *domain.Key) error {
 	err := impl.store.Delete(key.String())
 	return err
 }
 
-func (impl *repositoryImpl) ToEntity(m *syncmap.Message) *pack.Pack {
+func (impl *repositoryImpl) ToEntity(m *syncmap.Message) *domain.Pack {
 	if m == nil {
-		return &pack.Pack{}
+		return &domain.Pack{}
 	}
-	return pack.NewPack(
-		pack.NewKey(uuid.MustParse(m.Key())),
-		pack.NewValue(m.Value()),
+	return domain.NewPack(
+		domain.NewKey(m.Key()),
+		domain.NewValue(m.Value()),
 	)
 }
 
-func (impl *repositoryImpl) ToSyncmapMessage(pack *pack.Pack) *syncmap.Message {
+func (impl *repositoryImpl) ToSyncmapMessage(pack *domain.Pack) *syncmap.Message {
 	if pack == nil {
 		return &syncmap.Message{}
 	}

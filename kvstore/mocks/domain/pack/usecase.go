@@ -36,11 +36,12 @@ func (m *MockUsecase) EXPECT() *MockUsecaseMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockUsecase) Create(arg0 context.Context, arg1 *pack.Pack) error {
+func (m *MockUsecase) Create(arg0 context.Context, arg1 *pack.Value) (*pack.Pack, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*pack.Pack)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Create indicates an expected call of Create.
@@ -79,11 +80,12 @@ func (mr *MockUsecaseMockRecorder) Read(arg0, arg1 interface{}) *gomock.Call {
 }
 
 // Update mocks base method.
-func (m *MockUsecase) Update(arg0 context.Context, arg1 *pack.Pack) error {
+func (m *MockUsecase) Update(arg0 context.Context, arg1 *pack.Pack) (*pack.Pack, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*pack.Pack)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Update indicates an expected call of Update.

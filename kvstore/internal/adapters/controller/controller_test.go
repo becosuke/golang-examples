@@ -8,7 +8,6 @@ import (
 	mock "github.com/becosuke/golang-examples/kvstore/mocks/domain/pack"
 	"github.com/becosuke/golang-examples/kvstore/pb"
 	"github.com/golang/mock/gomock"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -33,7 +32,7 @@ func TestKVStoreServiceServerImpl_GetPack(t *testing.T) {
 	ctx := context.Background()
 	keyString := "b3b8500d-3502-4420-a600-49081c68d24b"
 	valueString := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
-	newKey := pack.NewKey(uuid.MustParse(keyString))
+	newKey := pack.NewKey(keyString)
 	newValue := pack.NewValue(valueString)
 	newPack := pack.NewPack(newKey, newValue)
 	newMockUsecase.EXPECT().Read(ctx, newKey).Return(newPack, nil)
@@ -58,15 +57,15 @@ func TestKVStoreServiceServerImpl_CreatePack(t *testing.T) {
 	_, err = newKVStoreServiceServer.CreatePack(ctx, &pb.CreatePackRequest{Value: &pb.Value{}})
 	assert.Error(t, err)
 
-	keyString :=   "00000000-0000-0000-0000-000000000000"
+	keyString := "b3b8500d-3502-4420-a600-49081c68d24b"
 	valueString := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
-	newKey := pack.NewKey(uuid.MustParse(keyString))
+	newKey := pack.NewKey(keyString)
 	newValue := pack.NewValue(valueString)
 	newPack := pack.NewPack(newKey, newValue)
-	newMockUsecase.EXPECT().Create(ctx, newPack).Return(nil)
+	newMockUsecase.EXPECT().Create(ctx, newValue).Return(newPack, nil)
 	res, err := newKVStoreServiceServer.CreatePack(ctx, &pb.CreatePackRequest{Value: &pb.Value{Body: valueString}})
 	require.NoError(t, err)
-	assert.Equal(t, &emptypb.Empty{}, res)
+	assert.Equal(t, valueString, res.GetPack().GetValue().GetBody())
 }
 
 func TestKvstoreServiceServerImpl_UpdatePack(t *testing.T) {
@@ -78,14 +77,15 @@ func TestKvstoreServiceServerImpl_UpdatePack(t *testing.T) {
 	ctx := context.Background()
 	keyString := "b3b8500d-3502-4420-a600-49081c68d24b"
 	valueString := "25338aef-9462-4c0e-bc8d-e701d3f66cc3"
-	newKey := pack.NewKey(uuid.MustParse(keyString))
+	newKey := pack.NewKey(keyString)
 	newValue := pack.NewValue(valueString)
 	newPack := pack.NewPack(newKey, newValue)
-	newMockUsecase.EXPECT().Update(ctx, newPack).Return(nil)
+	newMockUsecase.EXPECT().Update(ctx, newPack).Return(newPack, nil)
 	req := &pb.UpdatePackRequest{Key: &pb.Key{Body: keyString}, Value: &pb.Value{Body: valueString}}
 	res, err := newKVStoreServiceServer.UpdatePack(ctx, req)
 	assert.NoError(t, err)
-	assert.Equal(t, &emptypb.Empty{}, res)
+	assert.Equal(t, keyString, res.GetPack().GetKey().GetBody())
+	assert.Equal(t, valueString, res.GetPack().GetValue().GetBody())
 }
 
 func TestKvstoreServiceServerImpl_DeletePack(t *testing.T) {
@@ -96,7 +96,7 @@ func TestKvstoreServiceServerImpl_DeletePack(t *testing.T) {
 
 	ctx := context.Background()
 	keyString := "b3b8500d-3502-4420-a600-49081c68d24b"
-	newKey := pack.NewKey(uuid.MustParse(keyString))
+	newKey := pack.NewKey(keyString)
 	newMockUsecase.EXPECT().Delete(ctx, newKey).Return(nil)
 	req := &pb.DeletePackRequest{Key: &pb.Key{Body: keyString}}
 	res, err := newKVStoreServiceServer.DeletePack(ctx, req)

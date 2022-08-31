@@ -35,26 +35,26 @@ func (impl *kvstoreServiceServerImpl) GetPack(ctx context.Context, req *pb.GetPa
 	return &pb.GetPackResponse{Pack: impl.boundary.PackDomainToResource(res)}, nil
 }
 
-func (impl *kvstoreServiceServerImpl) CreatePack(ctx context.Context, req *pb.CreatePackRequest) (*emptypb.Empty, error) {
+func (impl *kvstoreServiceServerImpl) CreatePack(ctx context.Context, req *pb.CreatePackRequest) (*pb.CreatePackResponse, error) {
 	if err := req.ValidateAll(); err != nil {
 		return nil, err
 	}
-	err := impl.usecase.Create(ctx, impl.boundary.PackResourceToDomain(nil, req.GetValue()))
+	res, err := impl.usecase.Create(ctx, impl.boundary.ValueResourceToDomain(req.GetValue()))
 	if err != nil {
 		return nil, err
 	}
-	return &emptypb.Empty{}, nil
+	return &pb.CreatePackResponse{Pack: impl.boundary.PackDomainToResource(res)}, nil
 }
 
-func (impl *kvstoreServiceServerImpl) UpdatePack(ctx context.Context, req *pb.UpdatePackRequest) (*emptypb.Empty, error) {
+func (impl *kvstoreServiceServerImpl) UpdatePack(ctx context.Context, req *pb.UpdatePackRequest) (*pb.UpdatePackResponse, error) {
 	if err := req.ValidateAll(); err != nil {
 		return nil, err
 	}
-	err := impl.usecase.Update(ctx, impl.boundary.PackResourceToDomain(req.GetKey(), req.GetValue()))
+	res, err := impl.usecase.Update(ctx, impl.boundary.PackResourceToDomain(req.GetKey(), req.GetValue()))
 	if err != nil {
 		return nil, err
 	}
-	return &emptypb.Empty{}, nil
+	return &pb.UpdatePackResponse{Pack: impl.boundary.PackDomainToResource(res)}, nil
 }
 
 func (impl *kvstoreServiceServerImpl) DeletePack(ctx context.Context, req *pb.DeletePackRequest) (*emptypb.Empty, error) {

@@ -3,7 +3,6 @@ package boundary
 import (
 	"github.com/becosuke/golang-examples/kvstore/internal/domain/pack"
 	"github.com/becosuke/golang-examples/kvstore/pb"
-	"github.com/google/uuid"
 )
 
 type Boundary interface {
@@ -28,9 +27,9 @@ func (impl *boundaryImpl) KeyDomainToResource(domainKey *pack.Key) *pb.Key {
 
 func (impl *boundaryImpl) KeyResourceToDomain(resourceKey *pb.Key) *pack.Key {
 	if err := resourceKey.Validate(); err != nil || resourceKey == nil {
-		return pack.NewKey(uuid.Nil)
+		return pack.NewKey("")
 	}
-	return pack.NewKey(uuid.MustParse(resourceKey.GetBody()))
+	return pack.NewKey(resourceKey.GetBody())
 }
 
 func (impl *boundaryImpl) ValueDomainToResource(domainValue *pack.Value) *pb.Value {

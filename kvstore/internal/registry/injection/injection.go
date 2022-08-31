@@ -24,6 +24,7 @@ type Injection interface {
 	InjectUsecase() pack.Usecase
 	InjectBoundary() boundary.Boundary
 	InjectRepository() pack.Repository
+	InjectGenerator() pack.Generator
 	InjectSyncmap() syncmap.Syncmap
 }
 
@@ -40,6 +41,7 @@ type injectionImpl struct {
 		Usecase              pack.Usecase
 		Boundary             boundary.Boundary
 		Repository           pack.Repository
+		Generator pack.Generator
 		Syncmap              syncmap.Syncmap
 	}
 	serviceName string
@@ -131,10 +133,21 @@ func (i *injectionImpl) InjectRepository() pack.Repository {
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			i.container.Repository = repository.NewRepository(i.InjectConfig(), i.InjectSyncmap())
+			i.container.Repository = repository.NewRepository(i.InjectConfig(), i.InjectSyncmap(), i.InjectGenerator())
 		})
 	}
 	return i.container.Repository
+}
+
+func (i *injectionImpl) InjectGenerator() pack.Generator {
+	actual, _ := i.store.LoadOrStore("generator", &sync.Once{})
+	once, ok := actual.(*sync.Once)
+	if ok {
+		once.Do(func() {
+			i.container.Generator = repository.NewGenerator()
+		})
+	}
+	return i.container.Generator
 }
 
 func (i *injectionImpl) InjectSyncmap() syncmap.Syncmap {
