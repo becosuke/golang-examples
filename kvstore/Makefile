@@ -66,17 +66,27 @@ update-build-dependencies:
 	docker run --rm -v $(shell pwd):/root golang:1.18.0-alpine sh -c 'cp /usr/local/go/lib/time/zoneinfo.zip /root/build/zoneinfo.zip && cp /etc/ssl/certs/ca-certificates.crt /root/build/ca-certificates.crt'
 
 .PHONY: build-backend
-build-backend: build-backend-binary build-backend-container
+build-backend: build-backend-linux-binary build-backend-container
 
 .PHONY: build-gateway
-build-gateway: build-gateway-binary build-gateway-container
+build-gateway: build-gateway-linux-binary build-gateway-container
 
 build-backend-binary:
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo \
+	CGO_ENABLED=0 go build -a -installsuffix cgo \
 	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-backend" \
 	-o $(BUILD_DIR)/$(PROJECT_NAME)-backend $(COMMAND_DIR)/backend/main.go
 
 build-gateway-binary:
+	CGO_ENABLED=0 go build -a -installsuffix cgo \
+	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
+	-o $(BUILD_DIR)/$(PROJECT_NAME)-gateway $(COMMAND_DIR)/gateway/main.go
+
+build-backend-linux-binary:
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo \
+	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-backend" \
+	-o $(BUILD_DIR)/$(PROJECT_NAME)-backend $(COMMAND_DIR)/backend/main.go
+
+build-gateway-linux-binary:
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo \
 	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
 	-o $(BUILD_DIR)/$(PROJECT_NAME)-gateway $(COMMAND_DIR)/gateway/main.go
@@ -104,3 +114,15 @@ generate-mocks:
 	mockgen -source internal/domain/pack/repository.go -destination mocks/domain/pack/repository.go -package pack
 	mockgen -source internal/domain/pack/generator.go -destination mocks/domain/pack/generator.go -package pack
 	mockgen -source internal/drivers/syncmap/syncmap.go -destination mocks/drivers/syncmap/syncmap.go -package syncmap
+
+example-get:
+	curl -v 'http://localhost:50080/v1/pack/example-key'
+
+example-post:
+	curl -v -X POST -H 'Content-Type: application/json' -d '{"value": {"body": "example"}}' 'http://localhost:50080/v1/pack'
+
+example-put:
+	curl -v -X PUT -H 'Content-Type: application/json' -d '{"key": {"body": "example-key"}, "value": {"body":"example-value"}}' 'http://localhost:50080/v1/pack'
+
+example-delete:
+	curl -v -X DELETE 'http://localhost:50080/v1/pack/example-key'
