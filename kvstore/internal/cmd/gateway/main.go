@@ -7,7 +7,6 @@ import (
 	"github.com/becosuke/golang-examples/kvstore/pb"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.uber.org/zap"
-	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
@@ -52,32 +51,26 @@ func run() int {
 		Addr:    fmt.Sprintf(":%d", config.HttpPort),
 		Handler: mux,
 	}
-	wg, ctx := errgroup.WithContext(ctx)
-	wg.Go(func() error { return httpServer.ListenAndServe() })
-	logger.Info("httpServer listen", zap.Int("port", config.HttpPort))
 
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGTERM, os.Interrupt)
-	select {
-	case <-sigCh:
-		logger.Info("received SIGTERM, system is going gracefully shutdown")
-	case <-ctx.Done():
-	}
-
-	doneCh := make(chan struct{})
-
+	idleConnsClosed := make(chan struct{})
 	go func() {
-		defer close(doneCh)
-		logger.Info("http server is going gracefully shutdown")
-		httpServer.Shutdown(ctx)
+		defer close(idleConnsClosed)
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, syscall.SIGTERM, os.Interrupt)
+		<-sigCh
+		logger.Info("received SIGTERM, system is going gracefully shutdown")
+		if err := httpServer.Shutdown(ctx); err != nil {
+			logger.Error("received error on gracefully shutdown", zap.Error(err))
+		}
 		logger.Info("http server has completed gracefully shutdown")
 	}()
-
-	cancel()
-	if err := wg.Wait(); err != nil {
-		logger.Error("received error", zap.Error(err))
+	logger.Info("http server trys to listen", zap.Int("port", config.HttpPort))
+	if err := httpServer.ListenAndServe(); err != http.ErrServerClosed {
+		logger.Error("http server failed to listen", zap.Error(err))
 		return exitError
 	}
+	<-idleConnsClosed
 
+	cancel() // does it need this?
 	return exitOK
 }
