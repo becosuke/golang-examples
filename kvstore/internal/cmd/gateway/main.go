@@ -7,6 +7,7 @@ import (
 	"github.com/becosuke/golang-examples/kvstore/pb"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.uber.org/zap"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
@@ -41,9 +42,13 @@ func run() int {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, syscall.SIGTERM, os.Interrupt)
+	defer signal.Stop(interrupt)
+
 	err := pb.RegisterKVStoreServiceHandlerFromEndpoint(ctx, mux, fmt.Sprintf(":%d", config.GrpcPort), opts)
 	if err != nil {
-		logger.Error("failed to register handler", zap.Error(err))
+		logger.Error("http server: failed to register handler", zap.Error(err))
 		return exitError
 	}
 
@@ -52,25 +57,34 @@ func run() int {
 		Handler: mux,
 	}
 
-	idleConnsClosed := make(chan struct{})
-	go func() {
-		defer close(idleConnsClosed)
-		sigCh := make(chan os.Signal, 1)
-		signal.Notify(sigCh, syscall.SIGTERM, os.Interrupt)
-		<-sigCh
-		logger.Info("received SIGTERM, system is going gracefully shutdown")
-		if err := httpServer.Shutdown(ctx); err != nil {
-			logger.Error("received error on gracefully shutdown", zap.Error(err))
+	eg, ctx := errgroup.WithContext(ctx)
+	eg.Go(func() error {
+		if err := httpServer.ListenAndServe(); err != http.ErrServerClosed {
+			logger.Error("http server failed to listen", zap.Error(err))
+			return err
 		}
-		logger.Info("http server has completed gracefully shutdown")
-	}()
-	logger.Info("http server trys to listen", zap.Int("port", config.HttpPort))
-	if err := httpServer.ListenAndServe(); err != http.ErrServerClosed {
-		logger.Error("http server failed to listen", zap.Error(err))
+		return nil
+	})
+	logger.Info("http server: listening", zap.Int("port", config.HttpPort))
+
+	select {
+	case <-interrupt:
+		logger.Info("received shutdown signal")
+	case <-ctx.Done():
+		logger.Info("context canceled")
+	}
+	cancel()
+
+	logger.Info("http server: going gracefully shutdown")
+	if err := httpServer.Shutdown(ctx); err != context.Canceled {
+		logger.Error("received error on gracefully shutdown", zap.Error(err))
+	}
+	logger.Info("http server: completed gracefully shutdown")
+
+	if err := eg.Wait(); err != nil {
+		logger.Error("received error", zap.Error(err))
 		return exitError
 	}
-	<-idleConnsClosed
 
-	cancel() // does it need this?
 	return exitOK
 }

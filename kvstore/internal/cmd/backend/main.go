@@ -42,35 +42,35 @@ func run() int {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	grpcLn, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GrpcPort))
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, syscall.SIGTERM, os.Interrupt)
+	defer signal.Stop(interrupt)
+
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", config.GrpcPort))
 	if err != nil {
-		logger.Error("failed to listen grpc port", zap.Error(err))
+		logger.Error("grpc server: failed to listen", zap.Error(err))
 		return exitError
 	}
 
-	wg, ctx := errgroup.WithContext(ctx)
-	wg.Go(func() error { return grpcServer.Serve(grpcLn) })
-	logger.Info("grpcServer listen", zap.Int("port", config.GrpcPort))
+	eg, ctx := errgroup.WithContext(ctx)
+	eg.Go(func() error {
+		return grpcServer.Serve(listener)
+	})
+	logger.Info("grpc server: serving", zap.Int("port", config.GrpcPort))
 
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, syscall.SIGTERM, os.Interrupt)
 	select {
-	case <-sigCh:
-		logger.Info("received SIGTERM, system is going gracefully shutdown")
+	case <-interrupt:
+		logger.Info("received shutdown signal")
 	case <-ctx.Done():
+		logger.Info("context canceled")
 	}
-
-	doneCh := make(chan struct{})
-
-	go func() {
-		defer close(doneCh)
-		logger.Info("grpc server is going gracefully shutdown")
-		grpcServer.GracefulStop()
-		logger.Info("grpc server has completed gracefully shutdown")
-	}()
-
 	cancel()
-	if err := wg.Wait(); err != nil {
+
+	logger.Info("grpc server: going gracefully shutdown")
+	grpcServer.GracefulStop()
+	logger.Info("grpc server: completed gracefully shutdown")
+
+	if err := eg.Wait(); err != nil {
 		logger.Error("received error", zap.Error(err))
 		return exitError
 	}
