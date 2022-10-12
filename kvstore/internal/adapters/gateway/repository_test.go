@@ -6,7 +6,7 @@ import (
 	"github.com/becosuke/golang-examples/kvstore/internal/pkg/syncmap"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
 	mockDomain "github.com/becosuke/golang-examples/kvstore/mocks/domain/pack"
-	mockSyncmap "github.com/becosuke/golang-examples/kvstore/mocks/drivers/syncmap"
+	mockSyncmap "github.com/becosuke/golang-examples/kvstore/mocks/pkg/syncmap"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
