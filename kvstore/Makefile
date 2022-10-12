@@ -32,15 +32,15 @@ fmt:
 imports:
 	@find ./internal -iname "*.go" -not -path "./pkg/**" | xargs goimports -w -local $(PROJECT_REPOSITORY)
 
-run: run-backend run-gateway
+run: run-grpc run-rest
 
-run-backend:
-	go run -ldflags "-X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-backend" \
-	$(PROJECT_REPOSITORY)/$(COMMAND_DIR)/backend
+run-grpc:
+	go run -ldflags "-X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-grpc" \
+	$(PROJECT_REPOSITORY)/$(COMMAND_DIR)/grpc
 
-run-gateway:
-	go run -ldflags "-X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
-	$(PROJECT_REPOSITORY)/$(COMMAND_DIR)/gateway
+run-rest:
+	go run -ldflags "-X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-rest" \
+	$(PROJECT_REPOSITORY)/$(COMMAND_DIR)/rest
 
 .PHONY: test
 test: unit-test functional-test
@@ -54,50 +54,50 @@ functional-test:
 .PHONY: clean
 clean:
 	go clean
-	rm -f $(BUILD_DIR)/backend $(BUILD_DIR)/gateway
+	rm -f $(BUILD_DIR)/grpc $(BUILD_DIR)/rest
 
 clean-test:
 	go clean -testcache
 
 .PHONY: build
-build: update-build-dependencies build-backend build-gateway
+build: update-build-dependencies build-grpc build-rest
 
 update-build-dependencies:
 	docker run --rm -v $(shell pwd):/root golang:1.18.0-alpine sh -c 'cp /usr/local/go/lib/time/zoneinfo.zip /root/build/zoneinfo.zip && cp /etc/ssl/certs/ca-certificates.crt /root/build/ca-certificates.crt'
 
-.PHONY: build-backend
-build-backend: build-backend-linux-binary build-backend-container
+.PHONY: build-grpc
+build-grpc: build-grpc-linux-binary build-grpc-container
 
-.PHONY: build-gateway
-build-gateway: build-gateway-linux-binary build-gateway-container
+.PHONY: build-rest
+build-rest: build-rest-linux-binary build-rest-container
 
-build-backend-binary:
+build-grpc-binary:
 	CGO_ENABLED=0 go build -a -installsuffix cgo \
-	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-backend" \
-	-o $(BUILD_DIR)/$(PROJECT_NAME)-backend $(COMMAND_DIR)/backend/main.go
+	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-grpc" \
+	-o $(BUILD_DIR)/$(PROJECT_NAME)-grpc $(COMMAND_DIR)/grpc/main.go
 
-build-gateway-binary:
+build-rest-binary:
 	CGO_ENABLED=0 go build -a -installsuffix cgo \
-	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
-	-o $(BUILD_DIR)/$(PROJECT_NAME)-gateway $(COMMAND_DIR)/gateway/main.go
+	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-rest" \
+	-o $(BUILD_DIR)/$(PROJECT_NAME)-rest $(COMMAND_DIR)/rest/main.go
 
-build-backend-linux-binary:
+build-grpc-linux-binary:
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo \
-	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-backend" \
-	-o $(BUILD_DIR)/$(PROJECT_NAME)-backend $(COMMAND_DIR)/backend/main.go
+	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-grpc" \
+	-o $(BUILD_DIR)/$(PROJECT_NAME)-grpc $(COMMAND_DIR)/grpc/main.go
 
-build-gateway-linux-binary:
+build-rest-linux-binary:
 	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo \
-	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-gateway" \
-	-o $(BUILD_DIR)/$(PROJECT_NAME)-gateway $(COMMAND_DIR)/gateway/main.go
+	-ldflags "-w -X main.version=$(VERSION) -X main.serviceName=$(PROJECT_NAME)-rest" \
+	-o $(BUILD_DIR)/$(PROJECT_NAME)-rest $(COMMAND_DIR)/rest/main.go
 
-build-backend-container:
+build-grpc-container:
 	cd $(BUILD_DIR) && \
-	docker build . --no-cache --build-arg name=$(PROJECT_NAME)-backend -t $(PROJECT_NAME)-backend:latest -t $(PROJECT_NAME)-backend:$(VERSION)
+	docker build . --no-cache --build-arg name=$(PROJECT_NAME)-grpc -t $(PROJECT_NAME)-grpc:latest -t $(PROJECT_NAME)-grpc:$(VERSION)
 
-build-gateway-container:
+build-rest-container:
 	cd $(BUILD_DIR) && \
-	docker build . --no-cache --build-arg name=$(PROJECT_NAME)-gateway -t $(PROJECT_NAME)-gateway:latest -t $(PROJECT_NAME)-gateway:$(VERSION)
+	docker build . --no-cache --build-arg name=$(PROJECT_NAME)-rest -t $(PROJECT_NAME)-rest:latest -t $(PROJECT_NAME)-rest:$(VERSION)
 
 protoc:
 	protoc -I proto -I $(shell brew --prefix)/opt/protobuf/include \
@@ -109,11 +109,11 @@ protoc:
 	--validate_out "lang=go,paths=source_relative:pb" \
 	proto/kvstore.proto
 
-generate-mocks:
+gen-mocks:
 	mockgen -source internal/domain/pack/usecase.go -destination mocks/domain/pack/usecase.go -package pack
 	mockgen -source internal/domain/pack/repository.go -destination mocks/domain/pack/repository.go -package pack
 	mockgen -source internal/domain/pack/generator.go -destination mocks/domain/pack/generator.go -package pack
-	mockgen -source internal/drivers/syncmap/syncmap.go -destination mocks/drivers/syncmap/syncmap.go -package syncmap
+	mockgen -source internal/pkg/syncmap/syncmap.go -destination mocks/pkg/syncmap/syncmap.go -package syncmap
 
 example-get:
 	curl -v 'http://localhost:50080/v1/pack/example-key'

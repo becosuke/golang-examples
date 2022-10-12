@@ -1,14 +1,14 @@
-package repository
+package gateway
 
 import (
 	"context"
 	"errors"
 	domain "github.com/becosuke/golang-examples/kvstore/internal/domain/pack"
-	"github.com/becosuke/golang-examples/kvstore/internal/drivers/syncmap"
+	syncmap2 "github.com/becosuke/golang-examples/kvstore/internal/pkg/syncmap"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
 )
 
-func NewRepository(config *config.Config, syncmap syncmap.Syncmap, generator domain.Generator) domain.Repository {
+func NewRepository(config *config.Config, syncmap syncmap2.Syncmap, generator domain.Generator) domain.Repository {
 	return &repositoryImpl{
 		config:    config,
 		store:     syncmap,
@@ -18,7 +18,7 @@ func NewRepository(config *config.Config, syncmap syncmap.Syncmap, generator dom
 
 type repositoryImpl struct {
 	config    *config.Config
-	store     syncmap.Syncmap
+	store     syncmap2.Syncmap
 	generator domain.Generator
 }
 
@@ -46,7 +46,7 @@ func (impl *repositoryImpl) Delete(_ context.Context, key *domain.Key) error {
 	return err
 }
 
-func (impl *repositoryImpl) ToEntity(m *syncmap.Message) *domain.Pack {
+func (impl *repositoryImpl) ToEntity(m *syncmap2.Message) *domain.Pack {
 	if m == nil {
 		return &domain.Pack{}
 	}
@@ -56,11 +56,11 @@ func (impl *repositoryImpl) ToEntity(m *syncmap.Message) *domain.Pack {
 	)
 }
 
-func (impl *repositoryImpl) ToSyncmapMessage(pack *domain.Pack) *syncmap.Message {
+func (impl *repositoryImpl) ToSyncmapMessage(pack *domain.Pack) *syncmap2.Message {
 	if pack == nil {
-		return &syncmap.Message{}
+		return &syncmap2.Message{}
 	}
-	return syncmap.NewMessage(
+	return syncmap2.NewMessage(
 		pack.Key().String(),
 		pack.Value().String(),
 	)

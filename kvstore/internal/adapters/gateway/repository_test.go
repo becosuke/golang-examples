@@ -1,9 +1,9 @@
-package repository
+package gateway
 
 import (
 	"context"
 	"github.com/becosuke/golang-examples/kvstore/internal/domain/pack"
-	"github.com/becosuke/golang-examples/kvstore/internal/drivers/syncmap"
+	"github.com/becosuke/golang-examples/kvstore/internal/pkg/syncmap"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
 	mockDomain "github.com/becosuke/golang-examples/kvstore/mocks/domain/pack"
 	mockSyncmap "github.com/becosuke/golang-examples/kvstore/mocks/drivers/syncmap"

@@ -3,13 +3,13 @@ package injection
 import (
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/boundary"
 	"github.com/becosuke/golang-examples/kvstore/internal/adapters/controller"
-	"github.com/becosuke/golang-examples/kvstore/internal/adapters/repository"
+	"github.com/becosuke/golang-examples/kvstore/internal/adapters/gateway"
+	"github.com/becosuke/golang-examples/kvstore/internal/application/interactor"
 	"github.com/becosuke/golang-examples/kvstore/internal/domain/pack"
 	"github.com/becosuke/golang-examples/kvstore/internal/drivers/grpcserver"
-	"github.com/becosuke/golang-examples/kvstore/internal/drivers/logger"
-	"github.com/becosuke/golang-examples/kvstore/internal/drivers/syncmap"
+	"github.com/becosuke/golang-examples/kvstore/internal/pkg/logger"
+	"github.com/becosuke/golang-examples/kvstore/internal/pkg/syncmap"
 	"github.com/becosuke/golang-examples/kvstore/internal/registry/config"
-	"github.com/becosuke/golang-examples/kvstore/internal/usecases/interactor"
 	"github.com/becosuke/golang-examples/kvstore/pb"
 	"google.golang.org/grpc"
 	"log"
@@ -41,7 +41,7 @@ type injectionImpl struct {
 		Usecase              pack.Usecase
 		Boundary             boundary.Boundary
 		Repository           pack.Repository
-		Generator pack.Generator
+		Generator            pack.Generator
 		Syncmap              syncmap.Syncmap
 	}
 	serviceName string
@@ -133,7 +133,7 @@ func (i *injectionImpl) InjectRepository() pack.Repository {
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			i.container.Repository = repository.NewRepository(i.InjectConfig(), i.InjectSyncmap(), i.InjectGenerator())
+			i.container.Repository = gateway.NewRepository(i.InjectConfig(), i.InjectSyncmap(), i.InjectGenerator())
 		})
 	}
 	return i.container.Repository
@@ -144,7 +144,7 @@ func (i *injectionImpl) InjectGenerator() pack.Generator {
 	once, ok := actual.(*sync.Once)
 	if ok {
 		once.Do(func() {
-			i.container.Generator = repository.NewGenerator()
+			i.container.Generator = gateway.NewGenerator()
 		})
 	}
 	return i.container.Generator

@@ -1,4 +1,4 @@
-package repository
+package gateway
 
 import (
 	"github.com/becosuke/golang-examples/kvstore/internal/domain/pack"
